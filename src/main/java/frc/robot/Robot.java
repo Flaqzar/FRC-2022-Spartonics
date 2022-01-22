@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -16,7 +17,12 @@ public class Robot extends TimedRobot
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  //WPI_TalonFX testMotor2 = new WPI_TalonFX(1);
+  //TalonFX testMotor = new TalonFX(0);
+  //Joystick testJoystick = new Joystick(0);
+  Spark testSpark = new Spark(0);
 
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -37,7 +43,12 @@ public class Robot extends TimedRobot
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic()
+  {
+    //double stickAngle = testJoystick.getRawAxis(1) * -1;
+    //testMotor.set(ControlMode.PercentOutput, 0.1d);
+    testSpark.set(0.5d);
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
