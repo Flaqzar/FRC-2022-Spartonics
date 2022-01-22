@@ -20,8 +20,8 @@ public class Robot extends TimedRobot
   //WPI_TalonFX testMotor2 = new WPI_TalonFX(1);
   //TalonFX testMotor = new TalonFX(0);
   //Joystick testJoystick = new Joystick(0);
-  Spark testSpark = new Spark(0);
-
+  
+  Spark[] testSpark = new Spark[15];
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -30,6 +30,10 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    // ALL the sparks
+    for (int i=0; i < 15; i++){
+      testSpark[i] = new Spark(i);
+    }
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
@@ -47,7 +51,11 @@ public class Robot extends TimedRobot
   {
     //double stickAngle = testJoystick.getRawAxis(1) * -1;
     //testMotor.set(ControlMode.PercentOutput, 0.1d);
-    testSpark.set(0.5d);
+
+    // NOW MAKE THEM ALL SPIN
+    for (int i=0; i < 15; i++){
+    testSpark[i].set(0.5d);
+  }
   }
 
   /**
