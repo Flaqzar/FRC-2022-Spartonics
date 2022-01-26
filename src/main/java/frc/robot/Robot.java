@@ -5,6 +5,12 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.wpi.first.wpilibj.Joystick;
+// the axis is used for controlling triggers and joysitcks
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Axis;
+
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -19,10 +25,13 @@ public class Robot extends TimedRobot
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   //WPI_TalonFX testMotor2 = new WPI_TalonFX(1);
   //TalonFX testMotor = new TalonFX(0);
-  //Joystick testJoystick = new Joystick(0);
+
+  // defining mechanical aspects such as motors and pnumatics
   Spark testSpark = new Spark(0);
 
+  private final XboxController m_joystick = new XboxController(0);
   
+ 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -45,9 +54,11 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
-    //double stickAngle = testJoystick.getRawAxis(1) * -1;
+    double leftY = m_joystick.getLeftY();
     //testMotor.set(ControlMode.PercentOutput, 0.1d);
-    testSpark.set(0.5d);
+    testSpark.set(leftY * 0.9);
+   
+    
   }
 
   /**
