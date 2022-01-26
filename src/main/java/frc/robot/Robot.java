@@ -46,7 +46,7 @@ public class Robot extends TimedRobot
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
+   * diagnostsics that you want ran during disabled, autonomous, teleoperated and test.
    *
    * <p>This runs after the mode specific periodic functions, but before LiveWindow and
    * SmartDashboard integrated updating.
@@ -55,8 +55,11 @@ public class Robot extends TimedRobot
   public void robotPeriodic()
   {
     double leftY = m_joystick.getLeftY();
+    double leftTrigger = m_joystick.getLeftTriggerAxis();
+  
     //testMotor.set(ControlMode.PercentOutput, 0.1d);
-    testSpark.set(leftY * 0.9);
+    //testSpark.set(leftY * 0.9);
+    testSpark.set(leftTrigger * 0.9);
    
     
   }
