@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.Joystick;
-// the axis is used for controlling triggers and joysitcks
+// the axis is used for controlling triggers and joysticks
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import frc.robot.util;
@@ -26,6 +26,7 @@ public class Robot extends TimedRobot
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+
   // defining mechanical aspects such as motors and pnumatics
   
   //sparks are under this label
@@ -33,6 +34,10 @@ public class Robot extends TimedRobot
   
   //falcons are under this one
   private final WPI_TalonFX turningMotor0= new WPI_TalonFX(0);
+
+  // defining mechanical aspects such as motors and pneumatics
+  Spark testSpark = new Spark(0);
+
 
   private final XboxController m_joystick = new XboxController(0);
     
@@ -53,7 +58,7 @@ public class Robot extends TimedRobot
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
-   * diagnostsics that you want ran during disabled, autonomous, teleoperated and test.
+   * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
    *
    * <p>This runs after the mode specific periodic functions, but before LiveWindow and
    * SmartDashboard integrated updating.
