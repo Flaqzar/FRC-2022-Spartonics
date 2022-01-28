@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Joystick;
 // the axis is used for controlling triggers and joysticks
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
-import frc.robot.util;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
@@ -27,7 +26,7 @@ public class Robot extends TimedRobot
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
 
-  // defining mechanical aspects such as motors and pnumatics
+  // defining mechanical aspects such as motors and pneumatics
   
   //sparks are under this label
   //private final Spark intakeMotor = new Spark(0);
@@ -50,7 +49,7 @@ public class Robot extends TimedRobot
   public void robotInit()
   {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    m_chooser.addOption(kCustomAuto, kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
     
@@ -79,13 +78,13 @@ public class Robot extends TimedRobot
 
  
    
-    if (yButton == true)
+    if (yButton)
     {
       turningMotor0.set(ControlMode.Position, 0);
       System.out.println("0");
     } 
 
-    if (bButton == true)
+    if (bButton)
     {
       turningMotor0.set(ControlMode.Position, 90);
       System.out.println("90");
