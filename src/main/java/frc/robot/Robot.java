@@ -1,7 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+//import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -30,13 +30,13 @@ public class Robot extends TimedRobot
   // defining mechanical aspects such as motors and pnumatics
   
   //sparks are under this label
-  private final Spark intakeMotor = new Spark(0);
+  //private final Spark intakeMotor = new Spark(0);
   
   //falcons are under this one
   private final WPI_TalonFX turningMotor0= new WPI_TalonFX(0);
 
   // defining mechanical aspects such as motors and pneumatics
-  Spark testSpark = new Spark(0);
+  //Spark testSpark = new Spark(0);
 
 
   private final XboxController m_joystick = new XboxController(0);
