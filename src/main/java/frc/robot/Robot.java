@@ -67,6 +67,7 @@ public class Robot extends TimedRobot
   {
     
     // defining controls
+
     double leftY = m_joystick.getLeftY();
     double leftX = m_joystick.getLeftX();
     double leftTrigger = m_joystick.getLeftTriggerAxis();
