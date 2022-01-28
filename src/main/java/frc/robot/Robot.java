@@ -4,12 +4,14 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.Joystick;
 // the axis is used for controlling triggers and joysitcks
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
-
+import frc.robot.util;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -23,14 +25,17 @@ public class Robot extends TimedRobot
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  //WPI_TalonFX testMotor2 = new WPI_TalonFX(1);
-  //TalonFX testMotor = new TalonFX(0);
 
   // defining mechanical aspects such as motors and pnumatics
-  Spark testSpark = new Spark(0);
+  
+  //sparks are under this label
+  private final Spark intakeMotor = new Spark(0);
+  
+  //falcons are under this one
+  private final WPI_TalonFX turningMotor0= new WPI_TalonFX(0);
 
   private final XboxController m_joystick = new XboxController(0);
-  
+    
  
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -42,6 +47,8 @@ public class Robot extends TimedRobot
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    
   }
 
   /**
@@ -54,13 +61,32 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
+    
+    // defining controls
     double leftY = m_joystick.getLeftY();
+    double leftX = m_joystick.getLeftX();
     double leftTrigger = m_joystick.getLeftTriggerAxis();
-  
-    //testMotor.set(ControlMode.PercentOutput, 0.1d);
-    //testSpark.set(leftY * 0.9);
-    testSpark.set(leftTrigger * 0.9);
+    boolean yButton = m_joystick.getYButtonPressed();
+    boolean bButton = m_joystick.getBButtonPressed();
+    //uncomment below to turn on intake mechanism
+    //intakeMotor.set(1 * 0.85);
+
+
+ 
    
+    if (yButton == true)
+    {
+      turningMotor0.set(ControlMode.Position, 0);
+      System.out.println("0");
+    } 
+
+    if (bButton == true)
+    {
+      turningMotor0.set(ControlMode.Position, 90);
+      System.out.println("90");
+    }
+
+    //System.out.println(leftX + ", " + -leftY + ", " + util.XYposToRad(leftX,-leftY));
     
   }
 
@@ -122,3 +148,4 @@ public class Robot extends TimedRobot
   @Override
   public void testPeriodic() {}
 }
+
