@@ -1,18 +1,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-//import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.Joystick;
-// the axis is used for controlling triggers and joysticks
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Axis;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -26,23 +20,14 @@ public class Robot extends TimedRobot
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private double value = (90 / 360.0) * 2048;
+  private double value;
 
 
   // defining mechanical aspects such as motors and pneumatics
-  
-  //sparks are under this label
-  //private final Spark intakeMotor = new Spark(0);
   
   //falcons are under this one
-  private final WPI_TalonFX turningMotor0= new WPI_TalonFX(0);
-
-  // defining mechanical aspects such as motors and pneumatics
-  //Spark testSpark = new Spark(0);
-
-
+  private final WPI_TalonFX turningMotor0= new WPI_TalonFX(1);
   private final XboxController m_joystick = new XboxController(0);
-
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -60,7 +45,7 @@ public class Robot extends TimedRobot
     // All of the remaining code in this method is from
     // https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java%20Talon%20FX%20(Falcon%20500)/PositionClosedLoop/src/main/java/frc/robot/Robot.java
     //     pid tuning--       P     I    D
-    Gains kGains = new Gains(0.15, 0.0, 1.0, 0.0, 0, 1.0);
+    Gains kGains = new Gains(0.25, 0.0, 1.0, 0.0, 0, 1.0);
 
     /* Factory Default all hardware to prevent unexpected behavior */
     turningMotor0.configFactoryDefault();
@@ -116,7 +101,6 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
-    
     // defining controls
 
     double leftY = m_joystick.getLeftY();
@@ -125,14 +109,16 @@ public class Robot extends TimedRobot
     boolean yButton = m_joystick.getYButtonPressed();
     boolean bButton = m_joystick.getBButtonPressed();
     //uncomment below to turn on intake mechanism
-    //intakeMotor.set(1 * 0.85);
 
-    value = value + util.XYposToRad(leftX, -leftY); // ToDo: keep in range (0, 360] to prevent overflow and easier logging
+    double newValue = util.XYposToRad(leftX, -leftY);
+    if (newValue == Double.NaN) newValue = value;
+      else value = newValue;
+    value = newValue / 360 * 2040;
     turningMotor0.set(TalonFXControlMode.Position, value);
-    System.out.println(value);
-
-    //System.out.println(leftX + ", " + -leftY + ", " + util.XYposToRad(leftX,-leftY));
-    
+    System.out.println("\n");
+    System.out.println("leftX: " + leftX);
+    System.out.println("-leftY: " + -leftY);
+    System.out.println("value: " + value);    
   }
 
   /**
