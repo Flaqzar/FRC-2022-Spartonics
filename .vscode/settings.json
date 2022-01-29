@@ -26,7 +26,7 @@
     },
   ],
 "java.test.defaultConfig": "WPIlibUnitTests",
-"cSpell.words": [ // add unrecognized words to spell checker
+"cSpell.words": [
 	"teleop",
 	"teleoperated"
 ]
