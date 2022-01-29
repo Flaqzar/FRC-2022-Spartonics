@@ -127,7 +127,7 @@ public class Robot extends TimedRobot
     //uncomment below to turn on intake mechanism
     //intakeMotor.set(1 * 0.85);
 
-    value = value + util.XYposToRad(leftX, -leftY); // ToDo: keep in range (0, 360] to prevent overflow and easier logging
+    value = value + util.XYposToDeg(leftX, -leftY); // ToDo: keep in range (0, 360] to prevent overflow and easier logging
     turningMotor0.set(TalonFXControlMode.Position, value);
     System.out.println(value);
 
