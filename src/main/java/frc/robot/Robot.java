@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-//import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // the axis is used for controlling triggers and joysticks
@@ -31,13 +30,12 @@ public class Robot extends TimedRobot
   /**Settings are {kF, kP, kI, kD}*/
   private static final double[] PID_SETTINGS = {0d, 0.15d, 0d, 1d};
   
-  /**The main falcon 500 motor*/
-  private final WPI_TalonFX falcon0 = new WPI_TalonFX(0);
-  /**The main controller*/
+  /**Main falcon motor*/
+  private final WPI_TalonFX falcon0 = new WPI_TalonFX(1);
+  /**Main controller*/
   private final XboxController controller = new XboxController(0);
-  /**The falcon motor's rotation*/
   private double falcon0Rotation = 0d;
-  
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
