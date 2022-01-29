@@ -55,16 +55,14 @@ public class Robot extends TimedRobot
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption(kCustomAuto, kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-
+    //*    pid tuning--       P     I    D
     Gains kGains = new Gains(0.15, 0.0, 1.0, 0.0, 0, 1.0);
 
     /* Factory Default all hardware to prevent unexpected behavior */
 		turningMotor0.configFactoryDefault();
 		
 		/* Config the sensor used for Primary PID and sensor direction */
-        turningMotor0.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 
-                                            0,
-				                            30);
+    turningMotor0.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,0,30);
 
 		/* Ensure sensor is positive when output is positive */
 		turningMotor0.setSensorPhase(true);
