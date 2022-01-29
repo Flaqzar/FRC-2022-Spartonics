@@ -4,15 +4,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 //import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.Joystick;
 // the axis is used for controlling triggers and joysticks
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Axis;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -26,24 +23,21 @@ public class Robot extends TimedRobot
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private double value = (90 / 360.0) * 2048;
 
-
-  // defining mechanical aspects such as motors and pneumatics
+  /**The PID id used to determine what PID settings to use */
+  private static final int PID_ID = 0;
+  /**The delay in milliseconds before a report gets sent to DriverStation if an action fails */
+  private static final int MS_DELAY = 30;
+  /**Settings are {kF, kP, kI, kD}*/
+  private static final double[] PID_SETTINGS = {0d, 0.15d, 0d, 1d};
   
-  //sparks are under this label
-  //private final Spark intakeMotor = new Spark(0);
+  /**The main falcon 500 motor*/
+  private final WPI_TalonFX falcon0 = new WPI_TalonFX(0);
+  /**The main controller*/
+  private final XboxController controller = new XboxController(0);
+  /**The falcon motor's rotation*/
+  private double falcon0Rotation = 0d;
   
-  //falcons are under this one
-  private final WPI_TalonFX turningMotor0= new WPI_TalonFX(0);
-
-  // defining mechanical aspects such as motors and pneumatics
-  //Spark testSpark = new Spark(0);
-
-
-  private final XboxController m_joystick = new XboxController(0);
-
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -56,54 +50,23 @@ public class Robot extends TimedRobot
     m_chooser.addOption(kCustomAuto, kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    //Motor settings stuff
+    falcon0.configFactoryDefault();
+    falcon0.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID, MS_DELAY);
+    falcon0.setSensorPhase(true);
+    falcon0.setInverted(false);
 
-    // All of the remaining code in this method is from
-    // https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java%20Talon%20FX%20(Falcon%20500)/PositionClosedLoop/src/main/java/frc/robot/Robot.java
-    //     pid tuning--       P     I    D
-    Gains kGains = new Gains(0.15, 0.0, 1.0, 0.0, 0, 1.0);
+    falcon0.configNominalOutputForward(0d, MS_DELAY);
+    falcon0.configNominalOutputReverse(0d, MS_DELAY);
+    falcon0.configPeakOutputForward(1d, MS_DELAY);
+    falcon0.configPeakOutputReverse(-1d, MS_DELAY);
 
-    /* Factory Default all hardware to prevent unexpected behavior */
-    turningMotor0.configFactoryDefault();
+    falcon0.configAllowableClosedloopError(0, PID_ID, MS_DELAY);
 
-    /* Config the sensor used for Primary PID and sensor direction */
-    turningMotor0.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,0,30);
-
-    /* Ensure sensor is positive when output is positive */
-    turningMotor0.setSensorPhase(true);
-
-    /**
-     * Set based on what direction you want forward/positive to be.
-     * This does not affect sensor phase. 
-     */ 
-    turningMotor0.setInverted(false);
-
-    /*
-      * Talon FX does not need sensor phase set for its integrated sensor
-      * This is because it will always be correct if the selected feedback device is integrated sensor (default value)
-      * and the user calls getSelectedSensor* to get the sensor's position/velocity.
-      * 
-      * https://phoenix-documentation.readthedocs.io/en/latest/ch14_MCSensor.html#sensor-phase
-      */
-    // turningMotor0.setSensorPhase(true);
-
-    /* Config the peak and nominal outputs, 12V means full */
-    turningMotor0.configNominalOutputForward(0, 30);
-    turningMotor0.configNominalOutputReverse(0, 30);
-    turningMotor0.configPeakOutputForward(1, 30);
-    turningMotor0.configPeakOutputReverse(-1, 30);
-
-    /**
-     * Config the allowable closed-loop error, Closed-Loop output will be
-     * neutral within this range. See Table in Section 17.2.1 for native
-     * units per rotation.
-     */
-    turningMotor0.configAllowableClosedloopError(0, 0, 30);
-
-    /* Config Position Closed Loop gains in slot0, typically kF stays zero. */
-    turningMotor0.config_kF(0, kGains.kF, 30);
-    turningMotor0.config_kP(0, kGains.kP, 30);
-    turningMotor0.config_kI(0, kGains.kI, 30);
-    turningMotor0.config_kD(0, kGains.kD, 30);
+    falcon0.config_kF(PID_ID, PID_SETTINGS[0], MS_DELAY);
+    falcon0.config_kP(PID_ID, PID_SETTINGS[1], MS_DELAY);
+    falcon0.config_kI(PID_ID, PID_SETTINGS[2], MS_DELAY);
+    falcon0.config_kD(PID_ID, PID_SETTINGS[3], MS_DELAY);
   }
 
   /**
@@ -116,23 +79,20 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic()
   {
+    double leftXAxis = controller.getRawAxis(0);
+    double leftYAxis = controller.getRawAxis(1);
+    double leftJoystickDistance = Math.sqrt(leftXAxis * leftXAxis + leftYAxis * leftYAxis);
+
+    //Creates a deadzone of 10%
+    if(leftJoystickDistance < 0.1d)
+    {
+      leftXAxis = 0d;
+      leftYAxis = 0d;
+    }
+
     
-    // defining controls
-
-    double leftY = m_joystick.getLeftY();
-    double leftX = m_joystick.getLeftX();
-    double leftTrigger = m_joystick.getLeftTriggerAxis();
-    boolean yButton = m_joystick.getYButtonPressed();
-    boolean bButton = m_joystick.getBButtonPressed();
-    //uncomment below to turn on intake mechanism
-    //intakeMotor.set(1 * 0.85);
-
-    value = value + util.XYposToRad(leftX, -leftY); // ToDo: keep in range (0, 360] to prevent overflow and easier logging
-    turningMotor0.set(TalonFXControlMode.Position, value);
-    System.out.println(value);
-
-    //System.out.println(leftX + ", " + -leftY + ", " + util.XYposToRad(leftX,-leftY));
-    
+    falcon0Rotation = leftYAxis * 10.0 * 2048;
+    falcon0.set(ControlMode.Position, falcon0Rotation);
   }
 
   /**
