@@ -42,64 +42,69 @@ public class Robot extends TimedRobot
 
 
   private final XboxController m_joystick = new XboxController(0);
-    
- 
+
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit()
-  { //* Sorry for mess, will clean later
-
+  {
+    //? What does this do?
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption(kCustomAuto, kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    //*    pid tuning--       P     I    D
+
+
+    // All of the remaining code in this method is from
+    // https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java%20Talon%20FX%20(Falcon%20500)/PositionClosedLoop/src/main/java/frc/robot/Robot.java
+    //     pid tuning--       P     I    D
     Gains kGains = new Gains(0.15, 0.0, 1.0, 0.0, 0, 1.0);
 
     /* Factory Default all hardware to prevent unexpected behavior */
-		turningMotor0.configFactoryDefault();
-		
-		/* Config the sensor used for Primary PID and sensor direction */
+    turningMotor0.configFactoryDefault();
+
+    /* Config the sensor used for Primary PID and sensor direction */
     turningMotor0.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,0,30);
 
-		/* Ensure sensor is positive when output is positive */
-		turningMotor0.setSensorPhase(true);
+    /* Ensure sensor is positive when output is positive */
+    turningMotor0.setSensorPhase(true);
 
-		/**
-		 * Set based on what direction you want forward/positive to be.
-		 * This does not affect sensor phase. 
-		 */ 
-		turningMotor0.setInverted(false);
-		/*
-		 * Talon FX does not need sensor phase set for its integrated sensor
-		 * This is because it will always be correct if the selected feedback device is integrated sensor (default value)
-		 * and the user calls getSelectedSensor* to get the sensor's position/velocity.
-		 * 
-		 * https://phoenix-documentation.readthedocs.io/en/latest/ch14_MCSensor.html#sensor-phase
-		 */
-        // turningMotor0.setSensorPhase(true);
+    /**
+     * Set based on what direction you want forward/positive to be.
+     * This does not affect sensor phase. 
+     */ 
+    turningMotor0.setInverted(false);
 
-		/* Config the peak and nominal outputs, 12V means full */
-		turningMotor0.configNominalOutputForward(0, 30);
-		turningMotor0.configNominalOutputReverse(0, 30);
-		turningMotor0.configPeakOutputForward(1, 30);
-		turningMotor0.configPeakOutputReverse(-1, 30);
+    /*
+      * Talon FX does not need sensor phase set for its integrated sensor
+      * This is because it will always be correct if the selected feedback device is integrated sensor (default value)
+      * and the user calls getSelectedSensor* to get the sensor's position/velocity.
+      * 
+      * https://phoenix-documentation.readthedocs.io/en/latest/ch14_MCSensor.html#sensor-phase
+      */
+    // turningMotor0.setSensorPhase(true);
 
-		/**
-		 * Config the allowable closed-loop error, Closed-Loop output will be
-		 * neutral within this range. See Table in Section 17.2.1 for native
-		 * units per rotation.
-		 */
-		turningMotor0.configAllowableClosedloopError(0, 0, 30);
+    /* Config the peak and nominal outputs, 12V means full */
+    turningMotor0.configNominalOutputForward(0, 30);
+    turningMotor0.configNominalOutputReverse(0, 30);
+    turningMotor0.configPeakOutputForward(1, 30);
+    turningMotor0.configPeakOutputReverse(-1, 30);
 
-		/* Config Position Closed Loop gains in slot0, typically kF stays zero. */
-		turningMotor0.config_kF(0, kGains.kF, 30);
-		turningMotor0.config_kP(0, kGains.kP, 30);
-		turningMotor0.config_kI(0, kGains.kI, 30);
-		turningMotor0.config_kD(0, kGains.kD, 30);
-    }
+    /**
+     * Config the allowable closed-loop error, Closed-Loop output will be
+     * neutral within this range. See Table in Section 17.2.1 for native
+     * units per rotation.
+     */
+    turningMotor0.configAllowableClosedloopError(0, 0, 30);
+
+    /* Config Position Closed Loop gains in slot0, typically kF stays zero. */
+    turningMotor0.config_kF(0, kGains.kF, 30);
+    turningMotor0.config_kP(0, kGains.kP, 30);
+    turningMotor0.config_kI(0, kGains.kI, 30);
+    turningMotor0.config_kD(0, kGains.kD, 30);
+  }
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -122,7 +127,7 @@ public class Robot extends TimedRobot
     //uncomment below to turn on intake mechanism
     //intakeMotor.set(1 * 0.85);
 
-    value = value + util.XYposToRad(leftX, -leftY);
+    value = value + util.XYposToRad(leftX, -leftY); // ToDo: keep in range (0, 360] to prevent overflow and easier logging
     turningMotor0.set(TalonFXControlMode.Position, value);
     System.out.println(value);
 
