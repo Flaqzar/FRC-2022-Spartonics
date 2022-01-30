@@ -27,9 +27,9 @@ public class Robot extends TimedRobot
   private static final int PID_ID = 0;
   /**The delay in milliseconds before a report gets sent to DriverStation if an action fails */
   private static final int MS_DELAY = 30;
-  /**Settings are {kF, kP, kI, kD}*/
-  private static final double[] PID_SETTINGS = {0d, 0.15d, 0d, 1d};
-  
+  /**Settings are {kF, kP, kI, kD}*/         // F    P     I    D
+  private static final double[] PID_SETTINGS = {0d, 0.25d, 0d, 1d};
+
   /**Main falcon motor*/
   private final WPI_TalonFX falcon0 = new WPI_TalonFX(1);
   /**Main controller*/
