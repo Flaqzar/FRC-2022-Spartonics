@@ -35,6 +35,7 @@ public class Robot extends TimedRobot
   /**Main controller*/
   private final XboxController controller = new XboxController(0);
   private double falcon0Rotation = 0d;
+  private double currentRotation = 0d;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -88,8 +89,8 @@ public class Robot extends TimedRobot
       leftYAxis = 0d;
     }
 
-    
-    falcon0Rotation = leftYAxis * 10.0 * 2048;
+    currentRotation += currentRotation - (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d));
+    falcon0Rotation = (currentRotation / (2d * Math.PI)) / 2d * 2048d;
     falcon0.set(ControlMode.Position, falcon0Rotation);
   }
 
