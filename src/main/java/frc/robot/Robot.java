@@ -89,8 +89,9 @@ public class Robot extends TimedRobot
       leftYAxis = 0d;
     }
 
-    currentRotation += currentRotation - (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d));
-    falcon0Rotation = (currentRotation / (2d * Math.PI)) / 2d * 2048d;
+    //currentRotation += currentRotation - (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d));
+    currentRotation = (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d)) / (Math.PI * 2d);
+    falcon0Rotation = currentRotation * 2048d;
     falcon0.set(ControlMode.Position, falcon0Rotation);
   }
 
