@@ -49,23 +49,7 @@ public class Robot extends TimedRobot
     m_chooser.addOption(kCustomAuto, kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    //Motor settings stuff
-    falcon0.configFactoryDefault();
-    falcon0.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID, MS_DELAY);
-    falcon0.setSensorPhase(true);
-    falcon0.setInverted(false);
 
-    falcon0.configNominalOutputForward(0d, MS_DELAY);
-    falcon0.configNominalOutputReverse(0d, MS_DELAY);
-    falcon0.configPeakOutputForward(1d, MS_DELAY);
-    falcon0.configPeakOutputReverse(-1d, MS_DELAY);
-
-    falcon0.configAllowableClosedloopError(0, PID_ID, MS_DELAY);
-
-    falcon0.config_kF(PID_ID, PID_SETTINGS[0], MS_DELAY);
-    falcon0.config_kP(PID_ID, PID_SETTINGS[1], MS_DELAY);
-    falcon0.config_kI(PID_ID, PID_SETTINGS[2], MS_DELAY);
-    falcon0.config_kD(PID_ID, PID_SETTINGS[3], MS_DELAY);
   }
 
   /**
