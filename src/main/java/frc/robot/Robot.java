@@ -6,10 +6,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // the axis is used for controlling triggers and joysticks
 import edu.wpi.first.wpilibj.XboxController;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to
@@ -29,7 +25,7 @@ public class Robot extends TimedRobot {
     SwerveModule testswerve = new SwerveModule(0,1);
     /** Main controller */
     private final XboxController controller = new XboxController(0);
-    private double falcon0Rotation = 0d;
+
     private double currentRotation = 0d;
 
     /**
