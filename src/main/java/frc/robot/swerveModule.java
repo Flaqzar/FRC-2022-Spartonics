@@ -23,7 +23,7 @@ public class SwerveModule {
         // get the motor objects from the CAN bus
         driveFalcon = new WPI_TalonFX(driveMotor);
         steeringFalcon = new WPI_TalonFX(steeringMotor);
-        init();
+
     }
 
     /**
