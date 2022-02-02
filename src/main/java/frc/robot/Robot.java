@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
     /** Main controller */
     private final XboxController controller = new XboxController(0);
 
-    private double currentRotation = 0d;
+
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
 
         // currentRotation += currentRotation - (Math.atan(leftYAxis / leftXAxis) +
         // (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d));
-        currentRotation = (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d))
+        double currentRotation = (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d))
                 / (Math.PI * 2d);
         //falcon0Rotation = currentRotation * 2048d;
         testswerve.setAngle(currentRotation);
