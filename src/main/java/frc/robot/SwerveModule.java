@@ -58,61 +58,29 @@ public class SwerveModule {
 	public void setAngleFromJoystick(double x, double y)
 	{
 		double joystickAngle = (Math.atan(y / x) + (x < 0d ? Math.PI : 0d) + Constants.PI_OVER_TWO) / Constants.TWO_PI;
-		double clampedAngle = this.currentRotation % Constants.TWO_PI;
-		double distToLine = 0d;
-		double angleDist = 0d;
 		
-		if(Math.abs(joystickAngle - clampedAngle) > Math.PI)
-		{
-			if(joystickAngle > clampedAngle)
-			{
-				distToLine = joystickAngle - Math.PI - clampedAngle;
-				joystickAngle -= 2 * distToLine;
-			}
-			else
-			{
-				distToLine = clampedAngle - Math.PI - joystickAngle;
-				clampedAngle -= 2 * distToLine;
-			}
+		lerpedAngle = ((((oldpos-newpos) % 2pi)+pi) % 2pi) -pi
 
-			
-		}
-		
-		angleDist = Math.abs(joystickAngle - clampedAngle);
-
-		this.currentRotation += (joystickAngle > clampedAngle ? 1 : -1) * angleDist;
 		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 2048d);
 	}
 
 	/**
 	 * set the angle of the motor
 	 * 
-	 * @param angle desired angle of the motor
+	 * @param angle desired angle of the motor in Radians
+	 * 
 	 */
 	public void setAngle(double angle) {
 		/*
 		 * equations here are taken from:
-		 * https://gamedev.stackexchange.com/questions/14900/turning-a-sprite-such-that-
-		 * it-rotates-in-the-direction-thats-most-efficient
-		 * https://gamedev.stackexchange.com/questions/46552/360-degree-rotation-skips-
-		 * back-to-0-degrees-when-using-math-atan2y-x
-		 * https://github.com/Flaqzar/FRC-2022-Spartonics/pull/5/files/
-		 * 19c5107927d95797d443cb8c72289a7723397561#r796195340
-		 */
-		if (angle > this.lastAngle + 180) { // if the angle is more than 180 degrees from the last angle, subtract 360
-											// degrees to bring the target angle closer
-			angle -= 360;
-		} else if (angle < this.lastAngle - 180) { // add 360 degrees if the angle is less than a -180 degree turn
-													// (absolute
-													// value)
-			angle += 360;
-		} // if none of the above are covered, that means that the target angle is within
-			// 180 degrees of the old angle, and we do not need to modify it.
-			// if the difference between the current angle of the motor and the desired
-			// angle of the motor, while going clockwise, is less than 180, rotate clockwise
-		if (Math.abs(this.lastAngle - angle) < 180) {
-			this.steeringFalcon.set(ControlMode.Position, (360 - angle) / 360 * 2048);
-		}
+		 * https://www.desmos.com/calculator/rafir51bn0
+		*/
+		double rotate = this.lastAngle-angle;
+		rotate = (rotate % Constants.TWO_PI) + Math.PI;
+		rotate = (rotate % Constants.TWO_PI) - Math.PI;
+		
+		this.steeringFalcon.set(ControlMode.Position, lastAngle + angle / Constants.TWO_PI * 2048);
+		
 
 		this.lastAngle = angle;
 	}
