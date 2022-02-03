@@ -75,8 +75,10 @@ public class SwerveModule {
 				clampedAngle -= 2 * distToLine;
 			}
 
-			angleDist = Math.abs(joystickAngle - clampedAngle);
+			
 		}
+		
+		angleDist = Math.abs(joystickAngle - clampedAngle);
 
 		this.currentRotation += (joystickAngle > clampedAngle ? 1 : -1) * angleDist;
 		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 2048d);
