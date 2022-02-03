@@ -1,15 +1,14 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 /**
  * represents a swerve module. Wraps two falcon500s, one for driving and one for
  * steering
  */
-public class SwerveModule
-{
+public class SwerveModule {
 	// Motor objects used in each swerve drive module
 	WPI_TalonFX driveFalcon;
 	WPI_TalonFX steeringFalcon;
@@ -18,10 +17,10 @@ public class SwerveModule
 
 	/** The PID id used to determine what PID settings to use */
 	private static final int PID_ID = 0;
+	/** Rotation measured in radians. */
+	double currentRotation = 0d;
 
-
-	public SwerveModule(int driveMotor, int steeringMotor)
-	{
+	public SwerveModule(int driveMotor, int steeringMotor) {
 		// get the motor objects from the CAN bus
 		this.driveFalcon = new WPI_TalonFX(driveMotor);
 		this.steeringFalcon = new WPI_TalonFX(steeringMotor);
@@ -30,11 +29,11 @@ public class SwerveModule
 	/**
 	 * initialize the motors. Call this before doing stuff with the motor.
 	 */
-	public void init()
-	{
+	public void init() {
 		// Motor settings stuff
 		this.steeringFalcon.configFactoryDefault();
-		this.steeringFalcon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID, Constants.MS_DELAY);
+		this.steeringFalcon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID,
+				Constants.MS_DELAY);
 		this.steeringFalcon.setSensorPhase(true);
 		this.steeringFalcon.setInverted(false);
 
@@ -53,7 +52,34 @@ public class SwerveModule
 		this.steeringFalcon.config_kD(PID_ID, Constants.PID_SETTINGS[3], Constants.MS_DELAY);
 
 		// reset angle
-		this.steeringFalcon.set(ControlMode.Position, 0);
+		this.steeringFalcon.set(ControlMode.Position, this.currentRotation);
+	}
+
+	public void setAngleFromJoystick(double x, double y)
+	{
+		double joystickAngle = (Math.atan(y / x) + (x < 0d ? Math.PI : 0d) + Constants.PI_OVER_TWO) / Constants.TWO_PI;
+		double clampedAngle = this.currentRotation % Constants.TWO_PI;
+		double distToLine = 0d;
+		double angleDist = 0d;
+		
+		if(Math.abs(joystickAngle - clampedAngle) > Math.PI)
+		{
+			if(joystickAngle > clampedAngle)
+			{
+				distToLine = joystickAngle - Math.PI - clampedAngle;
+				joystickAngle -= 2 * distToLine;
+			}
+			else
+			{
+				distToLine = clampedAngle - Math.PI - joystickAngle;
+				clampedAngle -= 2 * distToLine;
+			}
+
+			angleDist = Math.abs(joystickAngle - clampedAngle);
+		}
+
+		this.currentRotation += (joystickAngle > clampedAngle ? 1 : -1) * angleDist;
+		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 2048d);
 	}
 
 	/**
@@ -61,28 +87,28 @@ public class SwerveModule
 	 * 
 	 * @param angle desired angle of the motor
 	 */
-	public void setAngle(double angle)
-	{
+	public void setAngle(double angle) {
 		/*
 		 * equations here are taken from:
-		   https://gamedev.stackexchange.com/questions/14900/turning-a-sprite-such-that-it-rotates-in-the-direction-thats-most-efficient
-		   https://gamedev.stackexchange.com/questions/46552/360-degree-rotation-skips-back-to-0-degrees-when-using-math-atan2y-x
-		   https://github.com/Flaqzar/FRC-2022-Spartonics/pull/5/files/19c5107927d95797d443cb8c72289a7723397561#r796195340
+		 * https://gamedev.stackexchange.com/questions/14900/turning-a-sprite-such-that-
+		 * it-rotates-in-the-direction-thats-most-efficient
+		 * https://gamedev.stackexchange.com/questions/46552/360-degree-rotation-skips-
+		 * back-to-0-degrees-when-using-math-atan2y-x
+		 * https://github.com/Flaqzar/FRC-2022-Spartonics/pull/5/files/
+		 * 19c5107927d95797d443cb8c72289a7723397561#r796195340
 		 */
-		if (angle > this.lastAngle + 180)
-		{ // if the angle is more than 180 degrees from the last angle, subtract 360 degrees to bring the target angle closer
+		if (angle > this.lastAngle + 180) { // if the angle is more than 180 degrees from the last angle, subtract 360
+											// degrees to bring the target angle closer
 			angle -= 360;
-		}
-		else if (angle < this.lastAngle - 180)
-		{ // add 360 degrees if the angle is less than a -180 degree turn (absolute
-												// value)
+		} else if (angle < this.lastAngle - 180) { // add 360 degrees if the angle is less than a -180 degree turn
+													// (absolute
+													// value)
 			angle += 360;
 		} // if none of the above are covered, that means that the target angle is within
 			// 180 degrees of the old angle, and we do not need to modify it.
 			// if the difference between the current angle of the motor and the desired
 			// angle of the motor, while going clockwise, is less than 180, rotate clockwise
-		if (Math.abs(this.lastAngle - angle) < 180)
-		{
+		if (Math.abs(this.lastAngle - angle) < 180) {
 			this.steeringFalcon.set(ControlMode.Position, (360 - angle) / 360 * 2048);
 		}
 

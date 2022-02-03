@@ -10,4 +10,10 @@ public class Constants
 
 	/** Settings are {kF, kP, kI, kD} */ // F P I D
 	public static final double[] PID_SETTINGS = { 0d, 0.25d, 0d, 1d };
+
+	/**2π*/
+	public static final double TWO_PI = 2d * Math.PI;
+
+	/**π/2*/
+	public static final double PI_OVER_TWO = Math.PI / 2d;
 }

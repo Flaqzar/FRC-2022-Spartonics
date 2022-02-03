@@ -59,17 +59,18 @@ public class Robot extends TimedRobot
 	{
 		double leftXAxis = this.controller.getRawAxis(0);
 		double leftYAxis = this.controller.getRawAxis(1);
-		double leftJoystickDistance = Math.sqrt(leftXAxis * leftXAxis + leftYAxis * leftYAxis);
 
 		// Creates a deadzone of 10%
-		if (leftJoystickDistance < 0.1d)
+		if (leftXAxis * leftXAxis + leftYAxis * leftYAxis < 0.01d)
 		{
 			leftXAxis = 0d;
 			leftYAxis = 0d;
 		}
 
-		double currentRotation = (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d)) / (Math.PI * 2d);
-		this.testswerve.setAngle(currentRotation);
+		this.testswerve.setAngleFromJoystick(leftXAxis, leftYAxis);
+
+		//double currentRotation = (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d)) / (Math.PI * 2d);
+		//this.testswerve.setAngle(currentRotation);
 	}
 
 	/**
