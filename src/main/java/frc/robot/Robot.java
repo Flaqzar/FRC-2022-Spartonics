@@ -67,7 +67,7 @@ public class Robot extends TimedRobot
 			leftYAxis = 0d;
 		}
 
-		this.testswerve.setAngleFromJoystick(leftXAxis, leftYAxis);
+		this.testswerve.setAngleFromJoystick(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 
 		//double currentRotation = (Math.atan(leftYAxis / leftXAxis) + (leftXAxis < 0d ? Math.PI : 0d) + (Math.PI / 2d)) / (Math.PI * 2d);
 		//this.testswerve.setAngle(currentRotation);

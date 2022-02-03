@@ -55,13 +55,16 @@ public class SwerveModule {
 		this.steeringFalcon.set(ControlMode.Position, this.currentRotation);
 	}
 
-	public void setAngleFromJoystick(double x, double y)
+	public void setAngleFromJoystick(double angle)
 	{
-		double joystickAngle = (Math.atan(y / x) + (x < 0d ? Math.PI : 0d) + Constants.PI_OVER_TWO) / Constants.TWO_PI;
-		
-		lerpedAngle = ((((oldpos-newpos) % 2pi)+pi) % 2pi) -pi
-
-		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 2048d);
+		//Clamps the motor's rotation from 0 - 2π
+		double clampedAngle = this.currentRotation % Constants.TWO_PI;
+		//Gets the distance between the two angles while compensating for the "flip" after 2π and before 0
+		double angleDist = Math.abs(angle - clampedAngle) > Math.PI ? angle > clampedAngle ? clampedAngle - angle + Constants.TWO_PI : angle - clampedAngle + Constants.TWO_PI : Math.abs(angle - clampedAngle);
+		//Adds the angle difference to the motor's current rotaiton
+ 		this.currentRotation += (angle > clampedAngle ? 1 : -1) * angleDist;
+		//Set's the new rotation
+ 		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 2048d);
 	}
 
 	/**
@@ -70,7 +73,8 @@ public class SwerveModule {
 	 * @param angle desired angle of the motor in Radians
 	 * 
 	 */
-	public void setAngle(double angle) {
+	public void setAngle(double angle)
+	{
 		/*
 		 * equations here are taken from:
 		 * https://www.desmos.com/calculator/rafir51bn0
@@ -81,7 +85,17 @@ public class SwerveModule {
 		
 		this.steeringFalcon.set(ControlMode.Position, lastAngle + angle / Constants.TWO_PI * 2048);
 		
-
 		this.lastAngle = angle;
+	}
+
+	/**
+	 * Converts a jotstick's x and y coordinates into a radian angle from 0 - 2π.
+	 * @param x the joystick's x position
+	 * @param y the joystick's y position
+	 * @return The joystick's rotation as an angle from 0 - 2π.
+	 */
+	public static double convertJoystickToAngle(double x, double y)
+	{
+		return (Math.atan(y / x) + (x < 0d ? Math.PI : 0d) + Constants.PI_OVER_TWO) / Constants.TWO_PI;
 	}
 }
