@@ -58,7 +58,7 @@ public class SwerveModule {
 
 	public void setAngleFromJoystick(double angle)
 	{
-		if(angle != Double.NaN)
+		if(!Double.isNaN(angle))
 		{
 			//Clamps the motor's rotation from 0 - 2π
 			double clampedAngle = this.currentRotation % Constants.TWO_PI;
