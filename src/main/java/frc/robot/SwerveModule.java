@@ -101,6 +101,6 @@ public class SwerveModule {
 	 */
 	public static double convertJoystickToAngle(double x, double y)
 	{
-		return (Math.atan(y / x) + (x < 0d ? Math.PI : 0d) + Constants.PI_OVER_TWO) / Constants.TWO_PI;
+		return Math.atan(y / x) + (x < 0d ? Math.PI : 0d) + Constants.PI_OVER_TWO;
 	}
 }
