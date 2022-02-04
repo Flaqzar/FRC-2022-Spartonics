@@ -16,4 +16,5 @@
 ![.](https://img.shields.io/static/v1?label=100%&message=nan%20free&color=8166cb&labelColor=ae9cde&style=for-the-badge)
 [![.](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
 ![.](https://img.shields.io/badge/Usually-works-9846f0?style=for-the-badge&labelColor=7b32c9)
+![.](https://img.shields.io/static/v1?label=can%27t%20run&message=doom&color=a42610&labelColor=d9371e&style=for-the-badge)
 <!-- ![.](URL) -->
