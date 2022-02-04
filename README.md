@@ -1,6 +1,5 @@
 # FRC-2022-Spartonics
 ![.](https://forthebadge.com/images/badges/powered-by-electricity.svg)
-![!](https://img.shields.io/static/v1?label=powered%20by&message=electricity&color=5e9741&labelColor=c1d72f&style=for-the-badge)
 ![.](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)
 ![.](https://forthebadge.com/images/badges/designed-in-etch-a-sketch.svg)
 ![.](https://forthebadge.com/images/badges/uses-badges.svg)
