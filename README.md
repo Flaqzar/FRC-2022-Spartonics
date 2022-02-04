@@ -14,4 +14,5 @@
 ![.](https://img.shields.io/static/v1?label=consumes&message=children&color=600000&labelColor=990000&style=for-the-badge)
 ![.](https://img.shields.io/badge/MADE_WITHOUT-DOCS-2ed9e8?style=for-the-badge&labelColor=24b0bd)
 ![.](https://img.shields.io/static/v1?label=100%&message=nan%20free&color=8166cb&labelColor=ae9cde&style=for-the-badge)
+[![.](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
 <!-- ![.](URL) -->
