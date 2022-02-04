@@ -11,7 +11,7 @@
 ![.](https://forthebadge.com/images/badges/built-by-developers.svg)
 ![.](https://forthebadge.com/images/badges/0-percent-optimized.svg)
 ![.](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg)
-![.](https://img.shields.io/static/v1?label=consumes&message=children&color=600000&labelColor=990000&style=for-the-badge)
+![.](https://img.shields.io/static/v1?label=consumes&message=children&color=600000&labelColor=990000&style=for-the-badge&logo=Amazon%20Lumberyard)
 ![.](https://img.shields.io/badge/MADE_WITHOUT-DOCS-2ed9e8?style=for-the-badge&labelColor=24b0bd)
 ![.](https://img.shields.io/static/v1?label=100%&message=nan%20free&color=8166cb&labelColor=ae9cde&style=for-the-badge)
 [![.](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
