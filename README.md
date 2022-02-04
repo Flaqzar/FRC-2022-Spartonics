@@ -11,6 +11,6 @@
 ![.](https://forthebadge.com/images/badges/built-by-developers.svg)
 ![.](https://forthebadge.com/images/badges/0-percent-optimized.svg)
 ![.](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg)
-![.](![.](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg))
 ![.](https://img.shields.io/static/v1?label=consumes&message=children&color=600000&labelColor=990000&style=for-the-badge)
+![.](https://img.shields.io/badge/MADE_WITHOUT-DOCS-2ed9e8?style=for-the-badge&labelColor=24b0bd)
 <!-- ![.](URL) -->
