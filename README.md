@@ -17,5 +17,4 @@
 [![.](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
 ![.](https://img.shields.io/badge/Usually-works-9846f0?style=for-the-badge&labelColor=7b32c9)
 ![.](https://img.shields.io/static/v1?label=can%27t%20run&message=doom&color=a42610&labelColor=d9371e&style=for-the-badge)
-![.](https://img.shields.io/static/v1?label=eclipse&message=is%20better&color=2c2255&labelColor=41317c&style=for-the-badge&logo=Eclipse%20IDE)
 <!-- ![.](URL) -->
