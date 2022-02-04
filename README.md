@@ -17,4 +17,5 @@
 [![.](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
 ![.](https://img.shields.io/badge/Usually-works-9846f0?style=for-the-badge&labelColor=7b32c9)
 ![.](https://img.shields.io/static/v1?label=can%27t%20run&message=doom&color=a42610&labelColor=d9371e&style=for-the-badge)
+![.](https://img.shields.io/static/v1?label=vscode&message=bad&color=0066a9&labelColor=007acc&style=for-the-badge&logo=Visual%20Studio%20Code)
 <!-- ![.](URL) -->
