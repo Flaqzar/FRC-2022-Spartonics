@@ -12,4 +12,5 @@
 ![.](https://forthebadge.com/images/badges/0-percent-optimized.svg)
 ![.](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg)
 ![.](![.](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg))
+![.](https://img.shields.io/static/v1?label=consumes&message=children&color=600000&labelColor=990000&style=for-the-badge)
 <!-- ![.](URL) -->
