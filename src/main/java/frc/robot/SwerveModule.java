@@ -86,7 +86,7 @@ public class SwerveModule {
 		*/
 		double rotate = this.lastAngle-angle;
 		rotate = rotate + Constants.PI_OVER_TWO;
-		rotate = (rotate % 360) - 180;
+		rotate = (rotate % Math.PI) - Constants.PI_OVER_TWO;
 		
 		this.steeringFalcon.set(ControlMode.Position, lastAngle + angle / Constants.TWO_PI * 2048);
 		
