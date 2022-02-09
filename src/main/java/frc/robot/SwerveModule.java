@@ -85,8 +85,8 @@ public class SwerveModule {
 		 * https://www.desmos.com/calculator/rafir51bn0
 		*/
 		double rotate = this.lastAngle-angle;
-		rotate = (rotate % Constants.TWO_PI) + Math.PI;
-		rotate = (rotate % Constants.TWO_PI) - Math.PI;
+		rotate = rotate + Constants.PI_OVER_TWO;
+		rotate = (rotate % 360) - 180;
 		
 		this.steeringFalcon.set(ControlMode.Position, lastAngle + angle / Constants.TWO_PI * 2048);
 		
