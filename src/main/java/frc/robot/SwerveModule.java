@@ -53,19 +53,18 @@ public class SwerveModule {
 		this.steeringFalcon.config_kD(PID_ID, Constants.PID_SETTINGS[3], Constants.MS_DELAY);
 
 		// reset angle
-		this.steeringFalcon.set(ControlMode.Position, this.currentRotation);
+		this.steeringFalcon.set(ControlMode.Position, 0d);
 	}
 
-	public void setAngleFromJoystick(double angle)
+	public void setAngleAlex(double joystickAngle)
 	{
-		if(!Double.isNaN(angle))
+		if(!Double.isNaN(joystickAngle))
 		{
 			//Clamps the motor's rotation from 0 - 2π
-			double clampedAngle = this.currentRotation % Constants.TWO_PI;
-			//Gets the distance between the two angles while compensating for the "flip" after 2π and before 0
-			double angleDist = Math.abs(angle - clampedAngle) > Math.PI ? angle > clampedAngle ? clampedAngle - angle + Constants.TWO_PI : angle - clampedAngle + Constants.TWO_PI : Math.abs(angle - clampedAngle);
-			//Adds the angle difference to the motor's current rotaiton
-			this.currentRotation += (angle > clampedAngle ? 1 : -1) * angleDist;
+			double motorAngle = this.currentRotation % Constants.TWO_PI;
+			//Adds the angle's difference to the motor's current rotaiton,
+			//adding/subtracting 2π to account for the flip from 2π - 0 on the joystick.
+			this.currentRotation += motorAngle - joystickAngle + (Math.abs(motorAngle - joystickAngle) > Math.PI ? (motorAngle > joystickAngle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d);
 		}
 		
 		//Set's the new rotation
@@ -78,7 +77,7 @@ public class SwerveModule {
 	 * @param angle desired angle of the motor in Radians
 	 * 
 	 */
-	public void setAngle(double angle)
+	public void setAngleMarcus(double angle)
 	{
 		/*
 		 * equations here are taken from:
