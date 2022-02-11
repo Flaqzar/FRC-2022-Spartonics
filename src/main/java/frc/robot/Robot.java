@@ -23,7 +23,10 @@ public class Robot extends TimedRobot
 	private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
 	//TODO fix CAN bus id's
-	SwerveModule testswerve = new SwerveModule(0,1);
+	SwerveModule module1 = new SwerveModule(2,1);
+	SwerveModule module2 = new SwerveModule(4,3);
+	SwerveModule module3 = new SwerveModule(6,5);
+	SwerveModule module4 = new SwerveModule(8,7);
 	/** Main controller */
 	private final XboxController controller = new XboxController(0);
 
@@ -40,7 +43,19 @@ public class Robot extends TimedRobot
 		this.m_chooser.addOption(kCustomAuto, kCustomAuto);
 		SmartDashboard.putData("Auto choices", this.m_chooser);
 		
-		this.testswerve.init();
+		this.module1.init();
+		this.module2.init();
+		this.module3.init();
+		this.module4.init();
+	}
+
+	@Override
+	public void disabledExit()
+	{
+		this.module1.init();
+		this.module2.init();
+		this.module3.init();
+		this.module4.init();
 	}
 
 	/**
@@ -60,11 +75,21 @@ public class Robot extends TimedRobot
 		double leftXAxis = this.controller.getRawAxis(0);
 		double leftYAxis = this.controller.getRawAxis(1);
 
+		double rightXAxis = this.controller.getRawAxis(4);
+		double rightYAxis = this.controller.getRawAxis(5);
+
 		// Creates a deadzone of 10%
-		if (leftXAxis * leftXAxis + leftYAxis * leftYAxis > 0.01d)
+		if (leftXAxis * leftXAxis + leftYAxis * leftYAxis > 0.25d)
 		{
-			this.testswerve.setAngleAlex(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
-			//this.testswerve.setAngleMarcus(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			this.module1.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			this.module2.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			this.module3.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			this.module4.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+		}
+
+		// Creates a deadzone of 10%
+		if (rightXAxis * rightXAxis + rightYAxis * rightYAxis > 0.25d)
+		{
 		}
 	}
 

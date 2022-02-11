@@ -33,8 +33,7 @@ public class SwerveModule {
 	public void init() {
 		// Motor settings stuff
 		this.steeringFalcon.configFactoryDefault();
-		this.steeringFalcon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID,
-				Constants.MS_DELAY);
+		this.steeringFalcon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID, Constants.MS_DELAY);
 		this.steeringFalcon.setSensorPhase(true);
 		this.steeringFalcon.setInverted(false);
 
@@ -53,10 +52,16 @@ public class SwerveModule {
 		this.steeringFalcon.config_kD(PID_ID, Constants.PID_SETTINGS[3], Constants.MS_DELAY);
 
 		// reset angle
-		this.steeringFalcon.set(ControlMode.Position, 0d);
+		double rot = this.steeringFalcon.getSelectedSensorPosition();
+		this.steeringFalcon.set(ControlMode.Position, rot - (rot % 26214.4d));
+		this.currentRotation = this.steeringFalcon.getSelectedSensorPosition() / 26214.4d * Constants.TWO_PI;
 	}
 
-	public void setAngleAlex(double joystickAngle)
+	/**
+	 * 
+	 * @param joystickAngle
+	 */
+	public void setAngle(double joystickAngle)
 	{
 		if(!Double.isNaN(joystickAngle))
 		{
@@ -64,32 +69,11 @@ public class SwerveModule {
 			double motorAngle = this.currentRotation % Constants.TWO_PI;
 			//Adds the angle's difference to the motor's current rotaiton,
 			//adding/subtracting 2π to account for the flip from 2π - 0 on the joystick.
-			this.currentRotation += motorAngle - joystickAngle + (Math.abs(motorAngle - joystickAngle) > Math.PI ? (motorAngle > joystickAngle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d);
+			this.currentRotation -= motorAngle - joystickAngle + (Math.abs(motorAngle - joystickAngle) > Math.PI ? (motorAngle > joystickAngle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d) + Constants.PI_OVER_TWO;
 		}
 		
 		//Set's the new rotation
- 		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 2048d);
-	}
-
-	/**
-	 * set the angle of the motor
-	 * 
-	 * @param angle desired angle of the motor in Radians
-	 * 
-	 */
-	public void setAngleMarcus(double angle)
-	{
-		/*
-		 * equations here are taken from:
-		 * https://www.desmos.com/calculator/rafir51bn0
-		*/
-		double rotate = this.lastAngle-angle;
-		rotate = rotate + Constants.PI_OVER_TWO;
-		rotate = (rotate % Math.PI) - Constants.PI_OVER_TWO;
-		
-		this.steeringFalcon.set(ControlMode.Position, lastAngle + angle / Constants.TWO_PI * 2048);
-		
-		this.lastAngle = angle;
+ 		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 26214.4d);
 	}
 
 	/**
