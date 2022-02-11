@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 /**
  * represents a swerve module. Wraps two falcon500s, one for driving and one for steering
@@ -13,19 +14,27 @@ public class SwerveModule
 	WPI_TalonFX driveFalcon;
 	WPI_TalonFX steeringFalcon;
 	double lastAngle;
-	// TODO: add the CANcoder
+	WPI_CANCoder canCoder;
 
 	/** The PID id used to determine what PID settings to use */
 	private static final int PID_ID = 0;
 	/** Rotation measured in radians. */
 	private double currentRotation;
 
-	public SwerveModule(int driveMotor, int steeringMotor)
+	/**
+	 * Initialize new swerve module.
+	 * 
+	 * @param driveMotor drive motor id
+	 * @param steeringMotor steering motor id
+	 * @param canCoder canCoder id
+	 */
+	public SwerveModule(int driveMotor, int steeringMotor, int canCoder)
 	{
 		// get the motor objects from the CAN bus
 		this.driveFalcon = new WPI_TalonFX(driveMotor);
 		this.steeringFalcon = new WPI_TalonFX(steeringMotor);
 		this.currentRotation = 0d;
+		this.canCoder = new WPI_CANCoder(canCoder);
 	}
 
 	/**
@@ -55,8 +64,12 @@ public class SwerveModule
 
 		// reset angle
 		double rot = this.steeringFalcon.getSelectedSensorPosition();
-		this.steeringFalcon.set(ControlMode.Position, rot - (rot % 26214.4d));
+		System.out.println(this.steeringFalcon.getDeviceID() + ": " + rot);
+		this.steeringFalcon.set(ControlMode.Position, rot - (rot % 26214.4d)); // 26214.4 = 2048 * gear ratio
 		this.currentRotation = this.steeringFalcon.getSelectedSensorPosition() / 26214.4d * Constants.TWO_PI;
+		System.out.println("after setting: " + this.steeringFalcon.getDeviceID() + ": " + this.steeringFalcon.getSelectedSensorPosition());
+
+		System.out.println(this.canCoder.getDeviceID() + "; " + this.canCoder.getPosition());
 	}
 
 	/**
@@ -79,8 +92,23 @@ public class SwerveModule
  		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 26214.4d);
 	}
 
+	public void setSpeed(double speed)
+	{
+		if (speed < 0 || speed > 1) {
+			System.out.println("Warning - SwerveModule.setSpeed: speed outside acceptable range.");
+			return;
+		}
+
+		this.driveFalcon.set(speed);
+	}
+
+	public void stop()
+	{
+		this.driveFalcon.stopMotor();
+	}
+
 	/**
-	 * Converts a jotstick's x and y coordinates into a radian angle from 0 - 2π.
+	 * Converts a joystick's x and y coordinates into a radian angle from 0 - 2π.
 	 * @param x the joystick's x position
 	 * @param y the joystick's y position
 	 * @return The joystick's rotation in radians.

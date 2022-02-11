@@ -22,11 +22,10 @@ public class Robot extends TimedRobot
 	private String m_autoSelected;
 	private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-	//TODO fix CAN bus id's
-	SwerveModule module1 = new SwerveModule(2,1);
-	SwerveModule module2 = new SwerveModule(4,3);
-	SwerveModule module3 = new SwerveModule(6,5);
-	SwerveModule module4 = new SwerveModule(8,7);
+	SwerveModule module1 = new SwerveModule(2, 1, 1); // ToDo: set canCoder id to correct values
+	SwerveModule module2 = new SwerveModule(4, 3, 2);
+	SwerveModule module3 = new SwerveModule(6, 5, 3);
+	SwerveModule module4 = new SwerveModule(8, 7, 4);
 	/** Main controller */
 	private final XboxController controller = new XboxController(0);
 
@@ -75,9 +74,6 @@ public class Robot extends TimedRobot
 		double leftXAxis = this.controller.getRawAxis(0);
 		double leftYAxis = this.controller.getRawAxis(1);
 
-		double rightXAxis = this.controller.getRawAxis(4);
-		double rightYAxis = this.controller.getRawAxis(5);
-
 		// Creates a deadzone of 10%
 		if (leftXAxis * leftXAxis + leftYAxis * leftYAxis > 0.25d)
 		{
@@ -86,75 +82,5 @@ public class Robot extends TimedRobot
 			this.module3.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 			this.module4.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 		}
-
-		// Creates a deadzone of 10%
-		if (rightXAxis * rightXAxis + rightYAxis * rightYAxis > 0.25d)
-		{
-		}
 	}
-
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different
-	 * autonomous modes using the dashboard. The sendable chooser code works with
-	 * the Java
-	 * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the
-	 * chooser code and
-	 * uncomment the getString line to get the auto name from the text box below the
-	 * Gyro
-	 *
-	 * <p>
-	 * You can add additional auto modes by adding additional comparisons to the
-	 * switch structure
-	 * below with additional strings. If using the SendableChooser make sure to add
-	 * them to the
-	 * chooser code above as well.
-	 */
-	@Override
-	public void autonomousInit()
-	{
-		this.m_autoSelected = this.m_chooser.getSelected();
-		// this.m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-		System.out.println("Auto selected: " + this.m_autoSelected);
-	}
-
-	/** This function is called periodically during autonomous. */
-	@Override
-	public void autonomousPeriodic()
-	{
-		switch (this.m_autoSelected)
-		{
-			case kCustomAuto:
-				// Put custom auto code here
-				break;
-			case kDefaultAuto:
-			default:
-				// Put default auto code here
-				break;
-		}
-	}
-
-	/** This function is called once when teleop is enabled. */
-	@Override
-	public void teleopInit() {}
-
-	/** This function is called periodically during operator control. */
-	@Override
-	public void teleopPeriodic() {}
-
-	/** This function is called once when the robot is disabled. */
-	@Override
-	public void disabledInit() {}
-
-	/** This function is called periodically when disabled. */
-	@Override
-	public void disabledPeriodic() {}
-
-	/** This function is called once when test mode is enabled. */
-	@Override
-	public void testInit() {}
-
-	/** This function is called periodically during test mode. */
-	@Override
-	public void testPeriodic() {}
 }
