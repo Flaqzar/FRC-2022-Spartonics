@@ -19,13 +19,12 @@ public class Robot extends TimedRobot
 {
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
-	private String m_autoSelected;
 	private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-	SwerveModule module1 = new SwerveModule(2, 1, 1); // ToDo: set canCoder id to correct values
-	SwerveModule module2 = new SwerveModule(4, 3, 2);
-	SwerveModule module3 = new SwerveModule(6, 5, 3);
-	SwerveModule module4 = new SwerveModule(8, 7, 4);
+	SwerveModule module1 = new SwerveModule(2, 1, 11, 95.888671875d); // ToDo: set canCoder id to correct values
+	SwerveModule module2 = new SwerveModule(4, 3, 12, 228.076171875d);
+	SwerveModule module3 = new SwerveModule(6, 5, 13, 93.603515625d);
+	SwerveModule module4 = new SwerveModule(8, 7, 14, 116.455078125d);
 	/** Main controller */
 	private final XboxController controller = new XboxController(0);
 

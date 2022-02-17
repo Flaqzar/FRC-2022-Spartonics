@@ -15,6 +15,7 @@ public class SwerveModule
 	WPI_TalonFX steeringFalcon;
 	double lastAngle;
 	WPI_CANCoder canCoder;
+	double offset;
 
 	/** The PID id used to determine what PID settings to use */
 	private static final int PID_ID = 0;
@@ -28,13 +29,14 @@ public class SwerveModule
 	 * @param steeringMotor steering motor id
 	 * @param canCoder canCoder id
 	 */
-	public SwerveModule(int driveMotor, int steeringMotor, int canCoder)
+	public SwerveModule(int driveMotor, int steeringMotor, int canCoder, double offsetIn)
 	{
 		// get the motor objects from the CAN bus
 		this.driveFalcon = new WPI_TalonFX(driveMotor);
 		this.steeringFalcon = new WPI_TalonFX(steeringMotor);
-		this.currentRotation = 0d;
 		this.canCoder = new WPI_CANCoder(canCoder);
+		this.currentRotation = 0;
+		//this.offset = offsetIn * 26214.4d / 360d;
 	}
 
 	/**
@@ -61,15 +63,25 @@ public class SwerveModule
 		this.steeringFalcon.config_kP(PID_ID, Constants.PID_SETTINGS[1], Constants.MS_DELAY);
 		this.steeringFalcon.config_kI(PID_ID, Constants.PID_SETTINGS[2], Constants.MS_DELAY);
 		this.steeringFalcon.config_kD(PID_ID, Constants.PID_SETTINGS[3], Constants.MS_DELAY);
-
+		
+		this.canCoder.configFactoryDefault();
+		
+		this.canCoder.setPositionToAbsolute();
+		
 		// reset angle
-		double rot = this.steeringFalcon.getSelectedSensorPosition();
-		System.out.println(this.steeringFalcon.getDeviceID() + ": " + rot);
-		this.steeringFalcon.set(ControlMode.Position, rot - (rot % 26214.4d)); // 26214.4 = 2048 * gear ratio
-		this.currentRotation = this.steeringFalcon.getSelectedSensorPosition() / 26214.4d * Constants.TWO_PI;
-		System.out.println("after setting: " + this.steeringFalcon.getDeviceID() + ": " + this.steeringFalcon.getSelectedSensorPosition());
+		System.out.println("Before: ");
+		System.out.println("  Can Coder: " + this.canCoder.getDeviceID());
+		System.out.println("  Can Rotation: " + this.canCoder.getAbsolutePosition());
+		System.out.println("  Motor Rotation: " + this.steeringFalcon.getActiveTrajectoryPosition());
 
-		System.out.println(this.canCoder.getDeviceID() + "; " + this.canCoder.getPosition());
+		this.steeringFalcon.set(ControlMode.Position, this.canCoder.getAbsolutePosition() * 26214.4d / 360d);
+		this.currentRotation = this.steeringFalcon.getActiveTrajectoryPosition() * Constants.TWO_PI / 26214.4d;
+		
+		System.out.println("After: ");
+		System.out.println("  Can Coder: " + this.canCoder.getDeviceID());
+		System.out.println("  Can Rotation: " + this.canCoder.getAbsolutePosition());
+		System.out.println("  Motor Rotation: " + this.steeringFalcon.getActiveTrajectoryPosition());
+		System.out.println();
 	}
 
 	/**
@@ -105,6 +117,11 @@ public class SwerveModule
 	public void stop()
 	{
 		this.driveFalcon.stopMotor();
+	}
+
+	public double getCanRotation()
+	{
+		return this.canCoder.getAbsolutePosition();
 	}
 
 	/**
