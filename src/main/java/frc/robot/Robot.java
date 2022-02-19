@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // the axis is used for controlling triggers and joysticks
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,80 +27,88 @@ public class Robot extends TimedRobot
 	SwerveModule module2 = new SwerveModule(4, 3, 12, -47.8125d);
 	SwerveModule module3 = new SwerveModule(6, 5, 13, -273.33984375d);
 	SwerveModule module4 = new SwerveModule(8, 7, 14, -296.54296875d);
+
+	Spark intakeMotor = new Spark(9);
+
 	/** Main controller */
 	private final XboxController controller = new XboxController(0);
 
-	private static boolean bButtonPressed = false;
+	private static boolean plusButtonPressed = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
-	 * for any
-	 * initialization code.
+	 * for any nitialization code.
 	 */
 	@Override
 	public void robotInit()
 	{
-		// ? What does this do?
+		// Idk what this does.
 		this.m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
 		this.m_chooser.addOption(kCustomAuto, kCustomAuto);
 		SmartDashboard.putData("Auto choices", this.m_chooser);
-	}
 
-	@Override
-	public void disabledExit()
-	{
+		// Initializes the swerve modules.
 		this.module1.init();
 		this.module2.init();
 		this.module3.init();
 		this.module4.init();
 	}
 
-	/**
-	 * This function is called every robot packet, no matter the mode. Use this for
-	 * items like
-	 * diagnostics that you want ran during disabled, autonomous, teleoperated and
-	 * test.
-	 *
-	 * <p>
-	 * This runs after the mode specific periodic functions, but before LiveWindow
-	 * and
-	 * SmartDashboard integrated updating.
-	 */
+	@Override
+	public void disabledExit()
+	{
+		// Resets the swerve module rotation to zero.
+		this.module1.reset();
+		this.module2.reset();
+		this.module3.reset();
+		this.module4.reset();
+	}
+
 	@Override
 	public void robotPeriodic()
 	{
 		double leftXAxis = this.controller.getRawAxis(0);
 		double leftYAxis = this.controller.getRawAxis(1);
+		double rightTrigger = this.controller.getRawAxis(3);
 
-		double Ltrigger = this.controller.getRawAxis(2);
-		double Rtrigger = this.controller.getRawAxis(3);
-
+		boolean plusButton = this.controller.getRawButton(8);
 		boolean bButton = this.controller.getBButton();
 
-		if(!bButtonPressed && bButton)
+		// Resets the swerve module rotation to zero when the plus button is pressed.
+		if(!plusButtonPressed && plusButton)
 		{
-			this.module1.init();
-			this.module2.init();
-			this.module3.init();
-			this.module4.init();
+			this.module1.reset();
+			this.module2.reset();
+			this.module3.reset();
+			this.module4.reset();
 		}
 
-		bButtonPressed = bButton;
+		plusButtonPressed = plusButton;
 
-		// Creates a deadzone of 10%
+		// Sets the intake motor's speed.		
+		if(bButton)
+		{
+			intakeMotor.set(0.55d);
+		}
+		else
+		{
+			intakeMotor.set(0d);
+		}
+
+		// Creates a deadzone of 10%.
 		if (leftXAxis * leftXAxis + leftYAxis * leftYAxis > 0.25d)
 		{
-			this.module1.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
-			this.module2.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
-			this.module3.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
-			this.module4.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			// Sets the rotation of the swerve modules to the rotaiton of the joystick
+			this.module1.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			this.module2.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			this.module3.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			this.module4.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 		}
 
-		double speedval = (Ltrigger + Rtrigger) / 2d;
-
-		this.module1.setSpeed(speedval);
-		this.module2.setSpeed(speedval);
-		this.module3.setSpeed(-speedval);
-		this.module4.setSpeed(-speedval);
+		// Sets the speed of the drive motors
+		this.module1.setSpeed(rightTrigger);
+		this.module2.setSpeed(rightTrigger);
+		this.module3.setSpeed(-rightTrigger);
+		this.module4.setSpeed(-rightTrigger);
 	}
 }

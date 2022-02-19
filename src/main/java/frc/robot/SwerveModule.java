@@ -3,26 +3,24 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
-// init strategy for cancoder
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.ctre.phoenix.sensors.WPI_CANCoder;
+
 /**
  * represents a swerve module. Wraps two falcon500s, one for driving and one for steering
  */
 public class SwerveModule
 {
-	// Motor objects used in each swerve drive module
-	WPI_TalonFX driveFalcon;
-	WPI_TalonFX steeringFalcon;
-	double lastAngle;
-	public WPI_CANCoder canCoder;
-	double offset;
-	double configOffset;
+	private final WPI_TalonFX driveFalcon;
+	private final WPI_TalonFX steeringFalcon;
+	private final WPI_CANCoder canCoder;
+	private final double canOffset;
 
-	/** The PID id used to determine what PID settings to use */
-	private static final int PID_ID = 0;
-	/** Rotation measured in radians. */
+	/** The steering motor rotation measured in radians. */
 	private double currentRotation;
+
+	/** The PID id used to determine what PID settings to use. */
+	private static final int PID_ID = 0;
 
 	/**
 	 * Initialize new swerve module.
@@ -31,24 +29,22 @@ public class SwerveModule
 	 * @param steeringMotor steering motor id
 	 * @param canCoder canCoder id
 	 */
-	public SwerveModule(int driveMotor, int steeringMotor, int canCoderIn, double offsetIn)
+	public SwerveModule(int driveMotorID, int steeringMotorID, int canCoderID, double canCoderOffset)
 	{
-		// get the motor objects from the CAN bus
-		this.driveFalcon = new WPI_TalonFX(driveMotor);
-		this.steeringFalcon = new WPI_TalonFX(steeringMotor);
-		this.canCoder = new WPI_CANCoder(canCoderIn);
+		this.driveFalcon = new WPI_TalonFX(driveMotorID);
+		this.steeringFalcon = new WPI_TalonFX(steeringMotorID);
+		this.canCoder = new WPI_CANCoder(canCoderID);
+		this.canOffset = canCoderOffset;
 		this.currentRotation = 0;
-		this.configOffset = offsetIn;
-		//this.offset = offsetIn * 26214.4d / 360d;
 	}
 
 	/**
-	 * initialize the motors. Call this before doing stuff with the motor.
+	 * Configures the motors and sets the steering motor's rotation to zero.
 	 */
 	public void init()
 	{
 		// Motor settings stuff
-		this.steeringFalcon.configFactoryDefault();
+		this.steeringFalcon.configFactoryDefault(Constants.MS_DELAY);
 		this.steeringFalcon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID, Constants.MS_DELAY);
 		this.steeringFalcon.setSensorPhase(true);
 		this.steeringFalcon.setInverted(false);
@@ -69,21 +65,31 @@ public class SwerveModule
 
 		// Configure the can coder
 		this.canCoder.configFactoryDefault(Constants.MS_DELAY);
-		this.canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-		this.canCoder.configMagnetOffset(this.configOffset, Constants.MS_DELAY);
+		this.canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, Constants.MS_DELAY);
+		this.canCoder.configMagnetOffset(this.canOffset, Constants.MS_DELAY);
 		this.canCoder.setPositionToAbsolute(Constants.MS_DELAY);
-		
+
+		//Reset the motor rotation
+		this.reset();
+	}
+
+	/**
+	 * Sets steering motor's rotation to zero.
+	 */
+	public void reset()
+	{
 		// Re-align the steering motor
-		// TODO find out why it's inconsistent
 		this.steeringFalcon.setSelectedSensorPosition(0d);
-		this.steeringFalcon.set(ControlMode.Position, -this.canCoder.getAbsolutePosition() * 26214.4d / 360d);
+		double angleToRotate = this.canCoder.getAbsolutePosition() > 180d ? this.canCoder.getAbsolutePosition() - 360d : this.canCoder.getAbsolutePosition();
+		this.steeringFalcon.set(ControlMode.Position, -angleToRotate * 26214.4d / 360d);
 		this.steeringFalcon.setSelectedSensorPosition(0d);
 		this.currentRotation = 0d;
 	}
 
 	/**
-	 * Sets the angle of the motor.
+	 * Sets the angle of the steering motor.
 	 * Calculations by Alex: https://www.desmos.com/calculator/t9mc7gj1bf
+	 * 
 	 * @param angle the angle in radians
 	 */
 	public void setAngle(double angle)
@@ -98,37 +104,62 @@ public class SwerveModule
 		}
 		
 		// Sets the new rotation
- 		this.steeringFalcon.set(ControlMode.Position,  (this.currentRotation + this.offset) / Constants.TWO_PI * 26214.4d);
+ 		this.steeringFalcon.set(ControlMode.Position,  (this.currentRotation) / Constants.TWO_PI * 26214.4d);
 	}
 
 	/**
+	 * Sets the speed of the drive motor.
 	 * 
-	 * @param speed
+	 * @param speed the percent speed from -1 to 1
 	 */
 	public void setSpeed(double speed)
 	{
+		//Sets the driving motor's speed to the passed in value clamped between -1 and 1.
 		this.driveFalcon.set(Math.max(-1d, Math.min(1d, speed)));
 	}
 
 	/**
-	 * 
+	 * Shuts down the motor.
 	 */
 	public void stop()
 	{
+		//idk
 		this.driveFalcon.stopMotor();
 	}
 
 	/**
+	 * Getter for the drive motor.
 	 * 
-	 * @return
+	 * @return The drive motor
 	 */
-	public double getCanRotation()
+	public WPI_TalonFX getDriveMotor()
 	{
-		return this.canCoder.getAbsolutePosition();
+		return this.driveFalcon;
+	}
+
+	/**
+	 * Getter for the steering motor.
+	 * 
+	 * @return The steering motor
+	 */
+	public WPI_TalonFX getSteeringMotor()
+	{
+		return this.steeringFalcon;
+	}
+
+	/**
+	 * Getter for the can coder.
+	 * 
+	 * @return The can coder
+	 */
+	public WPI_CANCoder getCasnCoder()
+	{
+		return this.canCoder;
 	}
 
 	/**
 	 * Converts a joystick's x and y coordinates into a radian angle from 0 - 2π.
+	 * 
 	 * @param x the joystick's x position
 	 * @param y the joystick's y position
 	 * @return The joystick's rotation in radians.
