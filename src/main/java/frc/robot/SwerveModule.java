@@ -4,7 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
-
+// init strategy for cancoder
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 /**
  * represents a swerve module. Wraps two falcon500s, one for driving and one for steering
  */
@@ -14,8 +15,9 @@ public class SwerveModule
 	WPI_TalonFX driveFalcon;
 	WPI_TalonFX steeringFalcon;
 	double lastAngle;
-	WPI_CANCoder canCoder;
+	public WPI_CANCoder canCoder;
 	double offset;
+	double configOffset;
 
 	/** The PID id used to determine what PID settings to use */
 	private static final int PID_ID = 0;
@@ -29,13 +31,14 @@ public class SwerveModule
 	 * @param steeringMotor steering motor id
 	 * @param canCoder canCoder id
 	 */
-	public SwerveModule(int driveMotor, int steeringMotor, int canCoder, double offsetIn)
+	public SwerveModule(int driveMotor, int steeringMotor, int canCoderIn, double offsetIn)
 	{
 		// get the motor objects from the CAN bus
 		this.driveFalcon = new WPI_TalonFX(driveMotor);
 		this.steeringFalcon = new WPI_TalonFX(steeringMotor);
-		this.canCoder = new WPI_CANCoder(canCoder);
+		this.canCoder = new WPI_CANCoder(canCoderIn);
 		this.currentRotation = 0;
+		this.configOffset = offsetIn;
 		//this.offset = offsetIn * 26214.4d / 360d;
 	}
 
@@ -58,30 +61,24 @@ public class SwerveModule
 
 		this.steeringFalcon.configAllowableClosedloopError(0, PID_ID, Constants.MS_DELAY);
 
-		// configure PID tuning
+		// Steering falcon PID tuning
 		this.steeringFalcon.config_kF(PID_ID, Constants.PID_SETTINGS[0], Constants.MS_DELAY);
 		this.steeringFalcon.config_kP(PID_ID, Constants.PID_SETTINGS[1], Constants.MS_DELAY);
 		this.steeringFalcon.config_kI(PID_ID, Constants.PID_SETTINGS[2], Constants.MS_DELAY);
 		this.steeringFalcon.config_kD(PID_ID, Constants.PID_SETTINGS[3], Constants.MS_DELAY);
-		
-		this.canCoder.configFactoryDefault();
-		
-		this.canCoder.setPositionToAbsolute();
-		
-		// reset angle
-		System.out.println("Before: ");
-		System.out.println("  Can Coder: " + this.canCoder.getDeviceID());
-		System.out.println("  Can Rotation: " + this.canCoder.getAbsolutePosition());
-		System.out.println("  Motor Rotation: " + this.steeringFalcon.getActiveTrajectoryPosition());
 
-		this.steeringFalcon.set(ControlMode.Position, this.canCoder.getAbsolutePosition() * 26214.4d / 360d);
-		this.currentRotation = this.steeringFalcon.getActiveTrajectoryPosition() * Constants.TWO_PI / 26214.4d;
+		// Configure the can coder
+		this.canCoder.configFactoryDefault(Constants.MS_DELAY);
+		this.canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+		this.canCoder.configMagnetOffset(this.configOffset, Constants.MS_DELAY);
+		this.canCoder.setPositionToAbsolute(Constants.MS_DELAY);
 		
-		System.out.println("After: ");
-		System.out.println("  Can Coder: " + this.canCoder.getDeviceID());
-		System.out.println("  Can Rotation: " + this.canCoder.getAbsolutePosition());
-		System.out.println("  Motor Rotation: " + this.steeringFalcon.getActiveTrajectoryPosition());
-		System.out.println();
+		// Re-align the steering motor
+		// TODO find out why it's inconsistent
+		this.steeringFalcon.setSelectedSensorPosition(0d);
+		this.steeringFalcon.set(ControlMode.Position, -this.canCoder.getAbsolutePosition() * 26214.4d / 360d);
+		this.steeringFalcon.setSelectedSensorPosition(0d);
+		this.currentRotation = 0d;
 	}
 
 	/**
@@ -101,24 +98,30 @@ public class SwerveModule
 		}
 		
 		// Sets the new rotation
- 		this.steeringFalcon.set(ControlMode.Position, this.currentRotation / Constants.TWO_PI * 26214.4d);
+ 		this.steeringFalcon.set(ControlMode.Position,  (this.currentRotation + this.offset) / Constants.TWO_PI * 26214.4d);
 	}
 
+	/**
+	 * 
+	 * @param speed
+	 */
 	public void setSpeed(double speed)
 	{
-		if (speed < 0 || speed > 1) {
-			System.out.println("Warning - SwerveModule.setSpeed: speed outside acceptable range.");
-			return;
-		}
-
-		this.driveFalcon.set(speed);
+		this.driveFalcon.set(Math.max(-1d, Math.min(1d, speed)));
 	}
 
+	/**
+	 * 
+	 */
 	public void stop()
 	{
 		this.driveFalcon.stopMotor();
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public double getCanRotation()
 	{
 		return this.canCoder.getAbsolutePosition();

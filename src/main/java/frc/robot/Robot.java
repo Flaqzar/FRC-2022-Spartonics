@@ -21,12 +21,15 @@ public class Robot extends TimedRobot
 	private static final String kCustomAuto = "My Auto";
 	private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-	SwerveModule module1 = new SwerveModule(2, 1, 11, 95.888671875d); // ToDo: set canCoder id to correct values
-	SwerveModule module2 = new SwerveModule(4, 3, 12, 228.076171875d);
-	SwerveModule module3 = new SwerveModule(6, 5, 13, 93.603515625d);
-	SwerveModule module4 = new SwerveModule(8, 7, 14, 116.455078125d);
+	// 94.833984375 47.8125 273.33984375 296.54296875
+	SwerveModule module1 = new SwerveModule(2, 1, 11, -94.833984375d);
+	SwerveModule module2 = new SwerveModule(4, 3, 12, -47.8125d);
+	SwerveModule module3 = new SwerveModule(6, 5, 13, -273.33984375d);
+	SwerveModule module4 = new SwerveModule(8, 7, 14, -296.54296875d);
 	/** Main controller */
 	private final XboxController controller = new XboxController(0);
+
+	private static boolean bButtonPressed = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -40,11 +43,6 @@ public class Robot extends TimedRobot
 		this.m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
 		this.m_chooser.addOption(kCustomAuto, kCustomAuto);
 		SmartDashboard.putData("Auto choices", this.m_chooser);
-		
-		this.module1.init();
-		this.module2.init();
-		this.module3.init();
-		this.module4.init();
 	}
 
 	@Override
@@ -73,6 +71,21 @@ public class Robot extends TimedRobot
 		double leftXAxis = this.controller.getRawAxis(0);
 		double leftYAxis = this.controller.getRawAxis(1);
 
+		double Ltrigger = this.controller.getRawAxis(2);
+		double Rtrigger = this.controller.getRawAxis(3);
+
+		boolean bButton = this.controller.getBButton();
+
+		if(!bButtonPressed && bButton)
+		{
+			this.module1.init();
+			this.module2.init();
+			this.module3.init();
+			this.module4.init();
+		}
+
+		bButtonPressed = bButton;
+
 		// Creates a deadzone of 10%
 		if (leftXAxis * leftXAxis + leftYAxis * leftYAxis > 0.25d)
 		{
@@ -81,5 +94,12 @@ public class Robot extends TimedRobot
 			this.module3.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 			this.module4.setAngle(SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 		}
+
+		double speedval = (Ltrigger + Rtrigger) / 2d;
+
+		this.module1.setSpeed(speedval);
+		this.module2.setSpeed(speedval);
+		this.module3.setSpeed(-speedval);
+		this.module4.setSpeed(-speedval);
 	}
 }
