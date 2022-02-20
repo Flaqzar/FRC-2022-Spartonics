@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -11,7 +12,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
  */
 public class SwerveModule
 {
-	private final WPI_TalonFX driveFalcon;
+	private final WPI_TalonFX drivingFalcon;
 	private final WPI_TalonFX steeringFalcon;
 	private final WPI_CANCoder canCoder;
 	private final double canOffset;
@@ -31,7 +32,7 @@ public class SwerveModule
 	 */
 	public SwerveModule(int driveMotorID, int steeringMotorID, int canCoderID, double canCoderOffset)
 	{
-		this.driveFalcon = new WPI_TalonFX(driveMotorID);
+		this.drivingFalcon = new WPI_TalonFX(driveMotorID);
 		this.steeringFalcon = new WPI_TalonFX(steeringMotorID);
 		this.canCoder = new WPI_CANCoder(canCoderID);
 		this.canOffset = canCoderOffset;
@@ -48,6 +49,8 @@ public class SwerveModule
 		this.steeringFalcon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID, Constants.MS_DELAY);
 		this.steeringFalcon.setSensorPhase(true);
 		this.steeringFalcon.setInverted(false);
+		this.steeringFalcon.setNeutralMode(NeutralMode.Brake);
+		this.drivingFalcon.setNeutralMode(NeutralMode.Brake);
 
 		// no idea what this does.
 		this.steeringFalcon.configNominalOutputForward(0d, Constants.MS_DELAY);
@@ -115,7 +118,7 @@ public class SwerveModule
 	public void setSpeed(double speed)
 	{
 		//Sets the driving motor's speed to the passed in value clamped between -1 and 1.
-		this.driveFalcon.set(Math.max(-1d, Math.min(1d, speed)));
+		this.drivingFalcon.set(Math.max(-1d, Math.min(1d, speed)));
 	}
 
 	/**
@@ -124,7 +127,7 @@ public class SwerveModule
 	public void stop()
 	{
 		//idk
-		this.driveFalcon.stopMotor();
+		this.drivingFalcon.stopMotor();
 	}
 
 	/**
@@ -134,7 +137,7 @@ public class SwerveModule
 	 */
 	public WPI_TalonFX getDriveMotor()
 	{
-		return this.driveFalcon;
+		return this.drivingFalcon;
 	}
 
 	/**
