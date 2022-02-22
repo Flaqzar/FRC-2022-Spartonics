@@ -20,7 +20,7 @@ public class Robot extends TimedRobot
 {
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
-	private final SendableChooser<String> m_chooser = new SendableChooser<String>();
+	private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
 	// Can offsets: 94.833984375, 47.8125, 273.33984375, 296.54296875
 	// Initialize all robot related the variables
@@ -34,11 +34,11 @@ public class Robot extends TimedRobot
 	/** Main controller */
 	private static final XboxController CONTROLLER = new XboxController(0);
 
-	private static boolean plusButtonPressed = false;
+	private boolean plusButtonPressed = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
-	 * for any nitialization code.
+	 * for any initialization code.
 	 */
 	@Override
 	public void robotInit()
@@ -91,12 +91,16 @@ public class Robot extends TimedRobot
 
 		plusButtonPressed = plusButton;
 
-		INTAKE_MOTOR.set(bButton ? 0.25d : aButton ? -0.25d : 0d);
+		if (bButton) {
+			INTAKE_MOTOR.set(0.25d);
+		} else {
+			INTAKE_MOTOR.set(aButton ? -0.25d : 0d);
+		}
 
 		// Creates a deadzone of 10%.
 		if (joystickDistance > 0.1d)
 		{
-			// Sets the rotation of the swerve modules to the rotaiton of the joystick
+			// Sets the rotation of the swerve modules to the rotation of the joystick
 			MODULE_1.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 			MODULE_2.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
 			MODULE_3.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));

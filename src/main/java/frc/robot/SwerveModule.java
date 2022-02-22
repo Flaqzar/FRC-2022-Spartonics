@@ -103,7 +103,11 @@ public class SwerveModule
 			// Clamps the motor's rotation from 0 - 2π
 			double motorAngle = this.currentRotation % Constants.TWO_PI;
 			// Adds the two angles' difference to the motor's current rotation
-			this.currentRotation -= motorAngle - angle + (Math.abs(motorAngle - angle) > Math.PI ? (motorAngle > angle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d) + Constants.PI_OVER_TWO;
+			if (Math.abs(Math.abs(motorAngle - angle)) > Math.PI) {
+				this.currentRotation -= motorAngle - angle + (motorAngle > angle ? -Constants.TWO_PI : Constants.TWO_PI) + Constants.PI_OVER_TWO;
+			} else {
+				this.currentRotation -= motorAngle - angle + Constants.PI_OVER_TWO;
+			}
 		}
 		
 		// Sets the new rotation
@@ -155,7 +159,7 @@ public class SwerveModule
 	 * 
 	 * @return The can coder
 	 */
-	public WPI_CANCoder getCasnCoder()
+	public WPI_CANCoder getCanCoder()
 	{
 		return this.canCoder;
 	}
