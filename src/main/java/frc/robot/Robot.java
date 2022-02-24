@@ -21,6 +21,7 @@ public class Robot extends TimedRobot
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
 	private final SendableChooser<String> m_chooser = new SendableChooser<String>();
+	private static int resetTimer = 0;
 
 	// Can offsets: 94.833984375, 47.8125, 273.33984375, 296.54296875
 	// Initialize all robot related the variables
@@ -49,13 +50,7 @@ public class Robot extends TimedRobot
 		SmartDashboard.putData("Auto choices", this.m_chooser);
 
 		// Initializes the swerve modules.
-		MODULE_1.init();
-		MODULE_2.init();
-		MODULE_3.init();
-		MODULE_4.init();
-
-		// Calibrate the gyro while it's at rest.
-		GYRO.calibrate();
+		resetTimer = 10;
 	}
 
 	@Override
@@ -74,6 +69,9 @@ public class Robot extends TimedRobot
 		double leftXAxis = CONTROLLER.getRawAxis(0);
 		double leftYAxis = CONTROLLER.getRawAxis(1);
 
+		double rightXAxis = CONTROLLER.getRawAxis(4);
+		double rightYAxis = CONTROLLER.getRawAxis(5);
+
 		boolean plusButton = CONTROLLER.getRawButton(8);
 		boolean bButton = CONTROLLER.getBButton();
 		boolean aButton = CONTROLLER.getAButton();
@@ -83,10 +81,21 @@ public class Robot extends TimedRobot
 		// Resets the swerve module rotation to zero when the plus button is pressed.
 		if(!plusButtonPressed && plusButton)
 		{
+			resetTimer = 10;
+		}
+
+		if(resetTimer > 0)
+		{
+			resetTimer--;
 			MODULE_1.reset();
 			MODULE_2.reset();
 			MODULE_3.reset();
 			MODULE_4.reset();
+
+			if(resetTimer == 0)
+			{
+				GYRO.calibrate();
+			}
 		}
 
 		plusButtonPressed = plusButton;
@@ -94,19 +103,24 @@ public class Robot extends TimedRobot
 		INTAKE_MOTOR.set(bButton ? 0.25d : aButton ? -0.25d : 0d);
 
 		// Creates a deadzone of 10%.
-		if (joystickDistance > 0.1d)
+		if (joystickDistance > 0.1d || rightXAxis * rightXAxis + rightYAxis * rightYAxis > 0.25d)
 		{
+			double gyroRotation = GYRO.getYaw() * Constants.TWO_PI / 360d;
+			double rotateAngle = rightXAxis * Constants.PI_OVER_TWO / 2d;
+			System.out.println(rotateAngle);
 			// Sets the rotation of the swerve modules to the rotaiton of the joystick
-			MODULE_1.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
-			MODULE_2.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
-			MODULE_3.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
-			MODULE_4.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis));
+			MODULE_1.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 0d);
+			MODULE_2.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 1d);
+			MODULE_3.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 2d);
+			MODULE_4.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 3d);
+
+			double speed = joystickDistance * (CONTROLLER.getRightTriggerAxis() > 0.5d ? 1d : 0.5d);
 
 			// Sets the speed of the drive motors
-			MODULE_1.setSpeed(joystickDistance/ 2d);
-			MODULE_2.setSpeed(joystickDistance/ 2d);
-			MODULE_3.setSpeed(-joystickDistance/ 2d);
-			MODULE_4.setSpeed(-joystickDistance/ 2d);
+			MODULE_1.setSpeed(speed);
+			MODULE_2.setSpeed(speed);
+			MODULE_3.setSpeed(-speed);
+			MODULE_4.setSpeed(-speed);
 		}
 		else
 		{
