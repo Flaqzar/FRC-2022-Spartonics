@@ -35,7 +35,7 @@ public class Robot extends TimedRobot
 	/** Main controller */
 	private static final XboxController CONTROLLER = new XboxController(0);
 
-	private boolean plusButtonPressed = false;
+	private static boolean plusButtonPressed = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -100,11 +100,7 @@ public class Robot extends TimedRobot
 
 		plusButtonPressed = plusButton;
 
-		if (bButton) {
-			INTAKE_MOTOR.set(0.25d);
-		} else {
-			INTAKE_MOTOR.set(aButton ? -0.25d : 0d);
-		}
+		INTAKE_MOTOR.set(bButton ? 0.25d : aButton ? -0.25d : 0d);
 
 		// Creates a deadzone of 10%.
 		if (joystickDistance > 0.1d || rightXAxis * rightXAxis + rightYAxis * rightYAxis > 0.25d)
