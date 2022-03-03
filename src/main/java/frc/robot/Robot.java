@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
+
+import java.util.Arrays;
+import java.util.Collections;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -78,7 +81,7 @@ public class Robot extends TimedRobot
 
 		Vec2d gyroVec = new Vec2d(GYRO.getYaw() + 180d, true);
 		Vec2d joystickVec = new Vec2d(leftXAxis, -leftYAxis);
-
+		double turnpow = leftXAxis;
 		// Resets the swerve module rotation to zero when the plus button is pressed.
 		if(!plusButtonPressed && plusButton)
 		{
@@ -107,18 +110,43 @@ public class Robot extends TimedRobot
 		if (joystickVec.getLengthSquared() > 0.01d)
 		{
 			// Sets the rotation of the swerve modules to the rotaiton of the joystick
-			MODULE_1.setAngle(joystickVec);
-			MODULE_2.setAngle(joystickVec);
-			MODULE_3.setAngle(joystickVec);
-			MODULE_4.setAngle(joystickVec);
+			Vec2d rot_1 = new Vec2d(-3d*Math.PI/4d, false);
+			Vec2d rot_2 = new Vec2d(3d*Math.PI/4d, false);
+			Vec2d rot_3 = new Vec2d(Math.PI/4d, false);
+			Vec2d rot_4 = new Vec2d(-Math.pi/4d, false);
 
-			double speed = joystickVec.getLength() * (CONTROLLER.getRightTriggerAxis() > 0.5d ? 1d : 0.5d);
+			rot_1.scale(turnpow);
+			rot_2.scale(turnpow);
+			rot_3.scale(turnpow);
+			rot_4.scale(turnpow);
+
+			Vec2d s1 = joystickVec.add(rot_1)
+			Vec2d s2 = joystickVec.add(rot_2)
+			Vec2d s3 = joystickVec.add(rot_3)
+			Vec2d s4 = joystickVec.add(rot_4)
+
+			MODULE_1.setAngle(s1);
+			MODULE_2.setAngle(s2);
+			MODULE_3.setAngle(s3);
+			MODULE_4.setAngle(s4);
+
+			//// double speed = joystickVec.getLength() * (CONTROLLER.getRightTriggerAxis() > 0.5d ? 1d : 0.5d);
+			double[  ] speeds = {s1.getLength(), s2.getLength(), s3.getLength(), s4.getLength(),};
+			double max = Collections.max(Arrays.asList(speeds));
+			
+			for (int i = 0; i < speeds.length; i++) {
+				speeds[i] /= max;
+			}
+
+
 
 			// Sets the speed of the drive motors
-			MODULE_1.setSpeed(speed);
-			MODULE_2.setSpeed(speed);
-			MODULE_3.setSpeed(-speed);
-			MODULE_4.setSpeed(-speed);
+			MODULE_1.setSpeed(speeds[1]);
+			MODULE_2.setSpeed(speeds[2]);
+			MODULE_3.setSpeed(speeds[3]);
+			MODULE_4.setSpeed(speeds[4]);
+
+
 		}
 		else
 		{
