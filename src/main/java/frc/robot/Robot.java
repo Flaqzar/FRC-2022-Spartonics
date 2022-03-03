@@ -35,7 +35,7 @@ public class Robot extends TimedRobot
 	/** Main controller */
 	private static final XboxController CONTROLLER = new XboxController(0);
 
-	private static boolean plusButtonPressed = false;
+	private boolean plusButtonPressed = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -76,12 +76,13 @@ public class Robot extends TimedRobot
 		boolean bButton = CONTROLLER.getBButton();
 		boolean aButton = CONTROLLER.getAButton();
 
-		double joystickDistance = Math.min(Math.sqrt(leftXAxis * leftXAxis + leftYAxis * leftYAxis), 1d);
+		Vec2d gyroVec = new Vec2d(GYRO.getYaw() + 180d, true);
+		Vec2d joystickVec = new Vec2d(leftXAxis, -leftYAxis);
 
 		// Resets the swerve module rotation to zero when the plus button is pressed.
 		if(!plusButtonPressed && plusButton)
 		{
-			resetTimer = 10;
+			resetTimer = 20;
 		}
 
 		if(resetTimer > 0)
@@ -103,18 +104,15 @@ public class Robot extends TimedRobot
 		INTAKE_MOTOR.set(bButton ? 0.25d : aButton ? -0.25d : 0d);
 
 		// Creates a deadzone of 10%.
-		if (joystickDistance > 0.1d || rightXAxis * rightXAxis + rightYAxis * rightYAxis > 0.25d)
+		if (joystickVec.getLengthSquared() > 0.01d)
 		{
-			double gyroRotation = GYRO.getYaw() * Constants.TWO_PI / 360d;
-			double rotateAngle = rightXAxis * Constants.PI_OVER_TWO / 2d;
-			System.out.println(rotateAngle);
 			// Sets the rotation of the swerve modules to the rotaiton of the joystick
-			MODULE_1.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 0d);
-			MODULE_2.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 1d);
-			MODULE_3.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 2d);
-			MODULE_4.setAngle(-SwerveModule.convertJoystickToAngle(leftXAxis, leftYAxis) + Math.PI + rotateAngle + Constants.PI_OVER_TWO * 3d);
+			MODULE_1.setAngle(joystickVec);
+			MODULE_2.setAngle(joystickVec);
+			MODULE_3.setAngle(joystickVec);
+			MODULE_4.setAngle(joystickVec);
 
-			double speed = joystickDistance * (CONTROLLER.getRightTriggerAxis() > 0.5d ? 1d : 0.5d);
+			double speed = joystickVec.getLength() * (CONTROLLER.getRightTriggerAxis() > 0.5d ? 1d : 0.5d);
 
 			// Sets the speed of the drive motors
 			MODULE_1.setSpeed(speed);

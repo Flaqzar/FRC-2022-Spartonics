@@ -18,7 +18,7 @@ public class SwerveModule
 	private final double canOffset;
 
 	/** The steering motor rotation measured in radians. */
-	private double currentRotation;
+	private double motorRotation;
 
 	/** The PID id used to determine what PID settings to use. */
 	private static final int PID_ID = 0;
@@ -36,7 +36,7 @@ public class SwerveModule
 		this.steeringFalcon = new WPI_TalonFX(steeringMotorID);
 		this.canCoder = new WPI_CANCoder(canCoderID);
 		this.canOffset = canCoderOffset;
-		this.currentRotation = 0;
+		this.motorRotation = 0;
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class SwerveModule
 		double angleToRotate = this.canCoder.getAbsolutePosition() > 180d ? this.canCoder.getAbsolutePosition() - 360d : this.canCoder.getAbsolutePosition();
 		this.steeringFalcon.set(ControlMode.Position, -angleToRotate * 26214.4d / 360d);
 		this.steeringFalcon.setSelectedSensorPosition(0d);
-		this.currentRotation = 0d;
+		this.motorRotation = 0d;
 	}
 
 	/**
@@ -95,19 +95,17 @@ public class SwerveModule
 	 * 
 	 * @param angle the angle in radians
 	 */
-	public void setAngle(double angle)
+	public void setAngle(Vec2d vec)
 	{
-		// Make sure that the input angle is a real number.
+		double angle = vec.getAngle();
+
 		if(!Double.isNaN(angle))
 		{
-			// Clamps the motor's rotation from 0 - 2π
-			double motorAngle = this.currentRotation % Constants.TWO_PI;
-			// Adds the two angles' difference to the motor's current rotation
-			this.currentRotation -= motorAngle - angle + (Math.abs(motorAngle - angle) > Math.PI ? (motorAngle > angle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d) + Constants.PI_OVER_TWO;
+			double motorAngle = this.motorRotation % Constants.TWO_PI;
+			double angleDif = motorAngle - angle;
+			this.motorRotation -= angleDif + (Math.abs(angleDif) > Math.PI ? (motorAngle > angle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d) + Constants.PI_OVER_TWO;
 		}
-		
-		// Sets the new rotation
- 		this.steeringFalcon.set(ControlMode.Position,  (this.currentRotation) / Constants.TWO_PI * 26214.4d);
+ 		this.steeringFalcon.set(ControlMode.Position, this.motorRotation / Constants.TWO_PI * 26214.4d);
 	}
 
 	/**
@@ -158,17 +156,5 @@ public class SwerveModule
 	public WPI_CANCoder getCanCoder()
 	{
 		return this.canCoder;
-	}
-
-	/**
-	 * Converts a joystick's x and y coordinates into a radian angle from 0 - 2π.
-	 * 
-	 * @param x the joystick's x position
-	 * @param y the joystick's y position
-	 * @return The joystick's rotation in radians.
-	 */
-	public static double convertJoystickToAngle(double x, double y)
-	{
-		return Math.atan(y / x) + (x < 0d ? Math.PI : 0d) + Constants.PI_OVER_TWO;
 	}
 }
