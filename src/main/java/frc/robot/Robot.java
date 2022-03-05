@@ -60,10 +60,7 @@ public class Robot extends TimedRobot
 	public void disabledExit()
 	{
 		// Resets the swerve module rotation to zero.
-		MODULE_1.reset();
-		MODULE_2.reset();
-		MODULE_3.reset();
-		MODULE_4.reset();
+		resetTimer = 20;
 	}
 
 	@Override
@@ -75,17 +72,24 @@ public class Robot extends TimedRobot
 		double rightXAxis = CONTROLLER.getRawAxis(4);
 		double rightYAxis = CONTROLLER.getRawAxis(5);
 
+		boolean minusButton = CONTROLLER.getRawButton(7);
 		boolean plusButton = CONTROLLER.getRawButton(8);
 		boolean bButton = CONTROLLER.getBButton();
 		boolean aButton = CONTROLLER.getAButton();
+		double rotMultiplier = Math.round(CONTROLLER.getRawAxis(3) + 1);
 
-		Vec2d gyroVec = new Vec2d(GYRO.getYaw() + 180d, true);
-		Vec2d joystickVec = new Vec2d(leftXAxis, -leftYAxis);
-		double turnpow = leftXAxis;
+		Vec2d joystickVec = new Vec2d(leftXAxis, -leftYAxis).scale(0.5d).rotate(GYRO.getYaw() + 180d, true);
+		
 		// Resets the swerve module rotation to zero when the plus button is pressed.
 		if(!plusButtonPressed && plusButton)
 		{
 			resetTimer = 20;
+		}
+
+		if(minusButton)
+		{
+			//GYRO.calibrate();
+			GYRO.reset();
 		}
 
 		if(resetTimer > 0)
@@ -95,66 +99,52 @@ public class Robot extends TimedRobot
 			MODULE_2.reset();
 			MODULE_3.reset();
 			MODULE_4.reset();
-
-			if(resetTimer == 0)
-			{
-				GYRO.calibrate();
-			}
 		}
 
 		plusButtonPressed = plusButton;
 
-		INTAKE_MOTOR.set(bButton ? 0.25d : aButton ? -0.25d : 0d);
+		if(bButton)
+		{
+			INTAKE_MOTOR.set(0.2d);
+		}
+		else if(aButton)
+		{
+			INTAKE_MOTOR.set(-0.5d);
+		}
+		else
+		{
+			INTAKE_MOTOR.set(0d);
+		}
 
 		// Creates a deadzone of 10%.
-		if (joystickVec.getLengthSquared() > 0.01d)
+		if(joystickVec.getLengthSquared() < 0.0225d)
 		{
-			// Sets the rotation of the swerve modules to the rotaiton of the joystick
-			Vec2d rot_1 = new Vec2d(-3d*Math.PI/4d, false);
-			Vec2d rot_2 = new Vec2d(3d*Math.PI/4d, false);
-			Vec2d rot_3 = new Vec2d(Math.PI/4d, false);
-			Vec2d rot_4 = new Vec2d(-Math.pi/4d, false);
+			joystickVec = joystickVec.scale(0d);
+		}
 
-			rot_1.scale(turnpow);
-			rot_2.scale(turnpow);
-			rot_3.scale(turnpow);
-			rot_4.scale(turnpow);
+		if(resetTimer <= 0)
+		{
+			double rotSpeed = rightXAxis * rotMultiplier;
+			Vec2d rot_1 = new Vec2d(-3d * Math.PI / 4d, -rotSpeed / 2d, false);
+			Vec2d rot_2 = new Vec2d(3d * Math.PI / 4d, rotSpeed / 2d, false);
+			Vec2d rot_3 = new Vec2d(Math.PI / 4d, rotSpeed / 2d, false);
+			Vec2d rot_4 = new Vec2d(-Math.PI / 4d, -rotSpeed / 2d, false);
 
-			Vec2d s1 = joystickVec.add(rot_1)
-			Vec2d s2 = joystickVec.add(rot_2)
-			Vec2d s3 = joystickVec.add(rot_3)
-			Vec2d s4 = joystickVec.add(rot_4)
+			Vec2d s1 = joystickVec.scale(-1d).add(rot_1);
+			Vec2d s2 = joystickVec.scale(-1d).add(rot_2);
+			Vec2d s3 = joystickVec.add(rot_3);
+			Vec2d s4 = joystickVec.add(rot_4);
 
 			MODULE_1.setAngle(s1);
 			MODULE_2.setAngle(s2);
 			MODULE_3.setAngle(s3);
 			MODULE_4.setAngle(s4);
 
-			//// double speed = joystickVec.getLength() * (CONTROLLER.getRightTriggerAxis() > 0.5d ? 1d : 0.5d);
-			double[  ] speeds = {s1.getLength(), s2.getLength(), s3.getLength(), s4.getLength(),};
-			double max = Collections.max(Arrays.asList(speeds));
-			
-			for (int i = 0; i < speeds.length; i++) {
-				speeds[i] /= max;
-			}
-
-
-
 			// Sets the speed of the drive motors
-			MODULE_1.setSpeed(speeds[1]);
-			MODULE_2.setSpeed(speeds[2]);
-			MODULE_3.setSpeed(speeds[3]);
-			MODULE_4.setSpeed(speeds[4]);
-
-
-		}
-		else
-		{
-			// Sets the speed of the drive motors
-			MODULE_1.setSpeed(0d);
-			MODULE_2.setSpeed(0d);
-			MODULE_3.setSpeed(0d);
-			MODULE_4.setSpeed(0d);
+			MODULE_1.setSpeed(s1.getLength());
+			MODULE_2.setSpeed(s2.getLength());
+			MODULE_3.setSpeed(s3.getLength());
+			MODULE_4.setSpeed(s4.getLength());
 		}
 	}
 }

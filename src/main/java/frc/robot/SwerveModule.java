@@ -81,6 +81,7 @@ public class SwerveModule
 	 */
 	public void reset()
 	{
+		System.out.println("E");
 		// Re-align the steering motor
 		this.steeringFalcon.setSelectedSensorPosition(0d);
 		double angleToRotate = this.canCoder.getAbsolutePosition() > 180d ? this.canCoder.getAbsolutePosition() - 360d : this.canCoder.getAbsolutePosition();
@@ -105,6 +106,7 @@ public class SwerveModule
 			double angleDif = motorAngle - angle;
 			this.motorRotation -= angleDif + (Math.abs(angleDif) > Math.PI ? (motorAngle > angle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d) + Constants.PI_OVER_TWO;
 		}
+
  		this.steeringFalcon.set(ControlMode.Position, this.motorRotation / Constants.TWO_PI * 26214.4d);
 	}
 
