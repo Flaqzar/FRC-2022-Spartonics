@@ -36,11 +36,11 @@ public class Vec2d
 	 */
 	public Vec2d(double xIn, double yIn)
 	{
-		if(xIn == -0d)
+		if(xIn == -0d || Double.isNaN(xIn))
 		{
 			xIn = 0d;
 		}
-		if(yIn == -0d)
+		if(yIn == -0d || Double.isNaN(yIn))
 		{
 			yIn = 0d;
 		}

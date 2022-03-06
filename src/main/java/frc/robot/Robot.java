@@ -9,9 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
-
-import java.util.Arrays;
-import java.util.Collections;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -21,6 +18,9 @@ import java.util.Collections;
  */
 public class Robot extends TimedRobot
 {
+	/** Wiimote support */
+	public static final boolean IS_WIIMOTE = true;
+
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
 	private final SendableChooser<String> m_chooser = new SendableChooser<String>();
@@ -34,6 +34,8 @@ public class Robot extends TimedRobot
 	private static final SwerveModule MODULE_4 = new SwerveModule(8, 7, 14, -296.54296875d);
 	private static final Spark INTAKE_MOTOR = new Spark(9);
 	private static final AHRS GYRO = new AHRS(SPI.Port.kMXP);
+
+
 
 	/** Main controller */
 	private static final XboxController CONTROLLER = new XboxController(0);
@@ -70,7 +72,6 @@ public class Robot extends TimedRobot
 		double leftYAxis = CONTROLLER.getRawAxis(1);
 
 		double rightXAxis = CONTROLLER.getRawAxis(4);
-		double rightYAxis = CONTROLLER.getRawAxis(5);
 
 		boolean minusButton = CONTROLLER.getRawButton(7);
 		boolean plusButton = CONTROLLER.getRawButton(8);
@@ -79,6 +80,32 @@ public class Robot extends TimedRobot
 		double rotMultiplier = Math.round(CONTROLLER.getRawAxis(3) + 1);
 
 		Vec2d joystickVec = new Vec2d(leftXAxis, -leftYAxis).scale(0.5d).rotate(GYRO.getYaw() + 180d, true);
+		
+		if(IS_WIIMOTE)
+		{
+			int pov = CONTROLLER.getPOV();
+			
+			if(pov == 315 || pov == 270 || pov == 226)
+			{
+				rightXAxis = -1d;
+			}
+			else if(pov == 45 || pov == 90 || pov == 135)
+			{
+				rightXAxis = 1d;
+			}
+			else
+			{
+				rightXAxis = 0;
+			}
+
+			aButton = CONTROLLER.getBButton();
+			bButton = CONTROLLER.getYButton();
+		}
+
+		System.out.println("a: " + CONTROLLER.getAButton());
+		System.out.println("b: " + CONTROLLER.getBButton());
+		System.out.println("x: " + CONTROLLER.getXButton());
+		System.out.println("y: " + CONTROLLER.getYButton());
 		
 		// Resets the swerve module rotation to zero when the plus button is pressed.
 		if(!plusButtonPressed && plusButton)
@@ -105,11 +132,11 @@ public class Robot extends TimedRobot
 
 		if(bButton)
 		{
-			INTAKE_MOTOR.set(0.2d);
+			INTAKE_MOTOR.set(-0.2d);
 		}
 		else if(aButton)
 		{
-			INTAKE_MOTOR.set(-0.5d);
+			INTAKE_MOTOR.set(0.5d);
 		}
 		else
 		{
@@ -130,10 +157,15 @@ public class Robot extends TimedRobot
 			Vec2d rot_3 = new Vec2d(Math.PI / 4d, rotSpeed / 2d, false);
 			Vec2d rot_4 = new Vec2d(-Math.PI / 4d, -rotSpeed / 2d, false);
 
+			System.out.println(rot_1);
+
 			Vec2d s1 = joystickVec.scale(-1d).add(rot_1);
 			Vec2d s2 = joystickVec.scale(-1d).add(rot_2);
 			Vec2d s3 = joystickVec.add(rot_3);
 			Vec2d s4 = joystickVec.add(rot_4);
+
+			System.out.println(s1);
+			System.out.println();
 
 			MODULE_1.setAngle(s1);
 			MODULE_2.setAngle(s2);
