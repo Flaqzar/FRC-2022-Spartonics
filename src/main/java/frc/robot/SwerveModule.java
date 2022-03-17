@@ -18,7 +18,7 @@ public class SwerveModule
 	private final double canOffset;
 
 	/** The steering motor rotation measured in radians. */
-	private double motorRotation;
+	public double motorRotation;
 
 	/** The PID id used to determine what PID settings to use. */
 	private static final int PID_ID = 0;
@@ -81,13 +81,12 @@ public class SwerveModule
 	 */
 	public void reset()
 	{
-		System.out.println("E");
 		// Re-align the steering motor
-		this.steeringFalcon.setSelectedSensorPosition(0d);
+		/*this.steeringFalcon.setSelectedSensorPosition(0d);
 		double angleToRotate = this.canCoder.getAbsolutePosition() > 180d ? this.canCoder.getAbsolutePosition() - 360d : this.canCoder.getAbsolutePosition();
 		this.steeringFalcon.set(ControlMode.Position, -angleToRotate * 26214.4d / 360d);
 		this.steeringFalcon.setSelectedSensorPosition(0d);
-		this.motorRotation = 0d;
+		this.motorRotation = 0d;*/
 	}
 
 	/**
