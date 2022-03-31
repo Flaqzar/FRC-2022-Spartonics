@@ -20,4 +20,9 @@ public class Constants
 
 	/**π/2*/
 	public static final double PI_OVER_TWO = Math.PI / 2d;
+
+	/** number of inches each drive encoder tick is */
+	public static final double INCHES_PER_TICK = Math.PI/3456d;
+	/** number of ticks in one inch */
+	public static final double TICKS_PER_INCH = 3456d/Math.PI;; 
 }

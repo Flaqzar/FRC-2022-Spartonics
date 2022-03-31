@@ -1,26 +1,10 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
-
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticsControlModule;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.PowerDistribution;
+
 
 public class DriveCoordinator {
 
@@ -87,12 +71,47 @@ public class DriveCoordinator {
 			MODULE_2.setSpeed(s2.getLength());
 			MODULE_3.setSpeed(s3.getLength());
 			MODULE_4.setSpeed(s4.getLength());
+			
 		}
 
     }
+	/// drives a distance (in inches) at a given angle
+	public void driveDistanceAtAngle(double dist, double angle) {
+		double distance = dist * Constants.TICKS_PER_INCH;
+		turnToAngle(angle);
+		resetDriveEncoders();
+
+	
+
+		MODULE_1.drivingFalcon.set(ControlMode.MotionMagic, distance);
+		MODULE_2.drivingFalcon.set(ControlMode.MotionMagic, distance);
+		MODULE_3.drivingFalcon.set(ControlMode.MotionMagic, distance);
+		MODULE_4.drivingFalcon.set(ControlMode.MotionMagic, distance);
+
+	}
+
+
+	/// resets the encoders for each swerve module's drive motor
+	public void resetDriveEncoders() {
+		MODULE_1.resetDriveEncoder();
+		MODULE_2.resetDriveEncoder();
+		MODULE_3.resetDriveEncoder();
+		MODULE_4.resetDriveEncoder();
+	}
+
+	/// Resets the swerve modules' rotations to zero.
+	public void reset()
+	{
+		resetTimer = 10;
+	}
 
     public void turnToAngle(double angle) {
-
+		MODULE_1.setAngle(new Vec2d(angle, 0d, false));
+		MODULE_2.setAngle(new Vec2d(angle, 0d, false));
+		MODULE_3.setAngle(new Vec2d(angle, 0d, false));
+		MODULE_4.setAngle(new Vec2d(angle, 0d, false));
     }
+
+
 }
 

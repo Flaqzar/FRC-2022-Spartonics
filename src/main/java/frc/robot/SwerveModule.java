@@ -12,7 +12,7 @@ import com.ctre.phoenix.sensors.WPI_CANCoder;
  */
 public class SwerveModule
 {
-	private final WPI_TalonFX drivingFalcon;
+	public final WPI_TalonFX drivingFalcon;
 	private final WPI_TalonFX steeringFalcon;
 	private final WPI_CANCoder canCoder;
 	private final double canOffset;
@@ -38,6 +38,16 @@ public class SwerveModule
 		this.canOffset = canCoderOffset;
 		this.motorRotation = 0;
 	}
+	public void resetDriveEncoder()
+	{
+		this.drivingFalcon.setSelectedSensorPosition(0, PID_ID, 0);
+	}
+
+	/// returns the distance this motor has driven in encoder ticks
+	public double getDriveEncoderDistance()
+	{
+		return this.drivingFalcon.getSelectedSensorPosition(PID_ID);
+	}
 
 	/**
 	 * Configures the motors and sets the steering motor's rotation to zero.
@@ -49,6 +59,9 @@ public class SwerveModule
 		this.steeringFalcon.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, PID_ID, Constants.MS_DELAY);
 		this.steeringFalcon.setSensorPhase(true);
 		this.steeringFalcon.setInverted(false);
+
+
+		// Make sure the motors brake
 		this.steeringFalcon.setNeutralMode(NeutralMode.Brake);
 		this.drivingFalcon.setNeutralMode(NeutralMode.Brake);
 
@@ -66,14 +79,36 @@ public class SwerveModule
 		this.steeringFalcon.config_kI(PID_ID, Constants.PID_SETTINGS[2], Constants.MS_DELAY);
 		this.steeringFalcon.config_kD(PID_ID, Constants.PID_SETTINGS[3], Constants.MS_DELAY);
 
+		// Drive falcon PID tuning 
+		this.steeringFalcon.config_kF(PID_ID, Constants.PID_SETTINGS[0], Constants.MS_DELAY);
+		this.steeringFalcon.config_kP(PID_ID, Constants.PID_SETTINGS[1], Constants.MS_DELAY);
+		this.steeringFalcon.config_kI(PID_ID, Constants.PID_SETTINGS[2], Constants.MS_DELAY);
+		this.steeringFalcon.config_kD(PID_ID, Constants.PID_SETTINGS[3], Constants.MS_DELAY);
+
+
+
+		//* set maximum velocity during autonomous: values are in encoder ticks per 100ms
+		//* i.e. a setting of 1*Constants.TICKS_PER_INCH = 1 inch per 100ms or 10in per second.
+		this.steeringFalcon.configMotionCruiseVelocity(1*Constants.TICKS_PER_INCH, Constants.MS_DELAY);
+
+		// set maximum current
+		
+
+
+
 		// Configure the can coder
 		this.canCoder.configFactoryDefault(Constants.MS_DELAY);
 		this.canCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, Constants.MS_DELAY);
 		this.canCoder.configMagnetOffset(this.canOffset, Constants.MS_DELAY);
 		this.canCoder.setPositionToAbsolute(Constants.MS_DELAY);
 
+		
+
 		//Reset the motor rotation
 		this.reset();
+
+		//set motor output to 10%
+		this.steeringFalcon.set(ControlMode.PercentOutput, 0.1);
 	}
 
 	/**
@@ -87,6 +122,7 @@ public class SwerveModule
 		this.steeringFalcon.set(ControlMode.Position, -angleToRotate * 26214.4d / 360d);
 		this.steeringFalcon.setSelectedSensorPosition(0d);
 		this.motorRotation = 0d;*/
+
 	}
 
 	/**
