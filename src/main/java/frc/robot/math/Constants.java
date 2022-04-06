@@ -8,18 +8,18 @@ public class Constants
 	 */
 	public static final int MS_DELAY = 30;
 
-	/** Settings are {kF, kP, kI, kD} */ // F P I D
+	/** Settings are {kF, kP, kI, kD} */
 	public static final double[] PID_SETTINGS = { 0d, 0.15d, 0d, 1.50d};
 
-	/**2π*/
+	/** 2π */
 	public static final double TWO_PI = 2d * Math.PI;
 
-	/**π/2*/
+	/** π/2 */
 	public static final double PI_OVER_TWO = Math.PI / 2d;
 
-    /**number of inches each drive encoder tick is */
+    /** Number of inches each drive encoder tick is. */
     public static final double INCHES_PER_TICK = Math.PI / 3456d;
 
-    /**number of ticks in one inch */
+    /** Number of ticks in one inch. */
     public static final double TICKS_PER_INCH = 3456d / Math.PI;
 }

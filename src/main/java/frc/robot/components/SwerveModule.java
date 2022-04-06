@@ -100,7 +100,7 @@ public class SwerveModule
 	 * Sets the angle of the steering motor.
 	 * Calculations by Alex: https://www.desmos.com/calculator/t9mc7gj1bf
 	 * 
-	 * @param angle the angle in radians
+	 * @param angle the angle in radians.
 	 */
 	public void setAngle(Vec2d vec)
 	{
@@ -119,11 +119,11 @@ public class SwerveModule
 	/**
 	 * Sets the speed of the drive motor.
 	 * 
-	 * @param speed the percent speed from -1 to 1
+	 * @param speed the percent speed from -1 to 1.
 	 */
 	public void setSpeed(double speed)
 	{
-		//Sets the driving motor's speed to the passed in value clamped between -1 and 1.
+		// Clamp the speed between -1 and 1.
 		this.drivingMotor.set(Math.max(-1d, Math.min(1d, speed)));
 	}
 
@@ -173,14 +173,5 @@ public class SwerveModule
 	public double getRotationDirection()
 	{
 		return this.rotDir;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "ServeModule[driving: " + this.drivingMotor.getDeviceID() + 
-				", steering: " + this.steeringMotor.getDeviceID() + 
-				", CAN: " + this.canCoder.getDeviceID() + 
-				", rotation: " + this.rotDir + "]";
 	}
 }

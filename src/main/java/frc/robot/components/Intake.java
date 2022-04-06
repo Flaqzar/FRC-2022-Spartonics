@@ -3,15 +3,25 @@ package frc.robot.components;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
+/**
+ * Container for the robot's intake.
+ */
 public class Intake implements IControllerMovement
 {
     private Spark motor;
     private double suck;
-    private double blow;
+    private double shoot;
 
-    public Intake(int intakeMotor, double suckSpeed, double blowSpeed)
+    /**
+     * @param intakeMotor the PWM id of the intake motor
+     * @param suckSpeed the speed of the motor when sucking in balls
+     * @param blowSpeed the speed of the motor when shooting out balls
+     */
+    public Intake(int intakeMotor, double suckSpeed, double shootSpeed)
     {
         this.motor = new Spark(intakeMotor);
+        this.suck = suckSpeed;
+        this.shoot = shootSpeed;
     }
 
     @Override
@@ -32,7 +42,7 @@ public class Intake implements IControllerMovement
 		}
 		else if(rTrigger)
 		{
-			this.blow();
+			this.shoot();
 		}
 		else
 		{
@@ -40,21 +50,35 @@ public class Intake implements IControllerMovement
 		}
     }
 
+    /**
+     * Sucks in the balls.
+     */
     public void suck()
     {
         this.motor.set(this.suck);
     }
 
-    public void blow()
+    /**
+     * Shoots out the balls.
+     */
+    public void shoot()
     {
-        this.motor.set(this.blow);
+        this.motor.set(this.shoot);
     }
 
+    /**
+     * Holds the balls.
+     */
     public void hold()
     {
         this.motor.set(0d);
     }
 
+    /**
+     * Getter for the intake's motor.
+     * 
+     * @return The motor used on the intake.
+     */
     public Spark getMotor()
     {
         return this.motor;

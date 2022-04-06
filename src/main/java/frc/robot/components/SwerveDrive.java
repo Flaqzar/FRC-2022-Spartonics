@@ -4,15 +4,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.math.Constants;
 import frc.robot.math.Vec2d;
 
 /**
- * Represents a swerve drivetrain.
+ * Container for the robot's swerve drivetrain.
  */
 public class SwerveDrive implements IControllerMovement
 {
@@ -21,8 +19,6 @@ public class SwerveDrive implements IControllerMovement
     private final List<SwerveModule> modules;
     
     /**
-     * Creates a swerve drive handler.
-     * 
      * @param gyroscope the swerve drive's gyroscope
      * @param swerveModules the swerve drive's wheel modules
      */
@@ -108,28 +104,46 @@ public class SwerveDrive implements IControllerMovement
     }
 
     /**
-     * Sets a timer that resets the motors.
+     * Set a timer for reseting the motors.
      */
     public void resetMotors()
     {
         resetTimer = resetTimer <= 0 ? 20 : resetTimer;
     }
 
+    /**
+     * Reset the gyro to 0°.
+     */
     public void resetGyro()
     {
         this.gyro.reset();
     }
 
+    /**
+     * Checks if the robot is resetting or if the gyro is callibrating.
+     * 
+     * @return Whether or not the robot can drive.
+     */
     public boolean canDrive()
     {
         return resetTimer <= 0 && !this.gyro.isCalibrating();
     }
 
+    /**
+     * Getter for the gyroscope.
+     * 
+     * @return The gyroscope.
+     */
     public AHRS getGyro()
     {
         return this.gyro;
     }
 
+    /**
+     * Getter for the swerve modules.
+     * 
+     * @return The swerve modules.
+     */
     public List<SwerveModule> getModules()
     {
         return this.modules;
