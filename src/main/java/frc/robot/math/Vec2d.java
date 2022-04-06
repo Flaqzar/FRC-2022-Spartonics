@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.math;
 
 /**
  * Represents a two-dimensional vector.
