@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * Container for the robot's elevator.
+ * 
+ * @author 2141 Spartonics
  */
 public class Elevator implements IControllerMovement
 {

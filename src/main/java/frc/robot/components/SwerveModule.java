@@ -11,7 +11,9 @@ import frc.robot.math.Constants;
 import frc.robot.math.Vec2d;
 
 /**
- * Represents a swerve module. Wraps two falcon500s, one for driving and one for steering
+ * Container for one swerve module. Wraps two falcon500s: one for driving and one for steering
+ * 
+ * @author 2141 Spartonics
  */
 public class SwerveModule
 {
@@ -97,10 +99,10 @@ public class SwerveModule
 	}
 
 	/**
-	 * Sets the angle of the steering motor.
-	 * Calculations by Alex: https://www.desmos.com/calculator/t9mc7gj1bf
+	 * Sets the angle of the steering motor. Calculations by Alex Green.
 	 * 
 	 * @param angle the angle in radians.
+     * @see <a href="https://www.desmos.com/calculator/t9mc7gj1bf">Alex's Calculations</a>
 	 */
 	public void setAngle(Vec2d vec)
 	{

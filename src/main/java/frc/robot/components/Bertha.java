@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * Container for Big Bertha, the massive piston.
+ * 
+ * @author 2141 Spartonics
  */
 public class Bertha implements IControllerMovement
 {

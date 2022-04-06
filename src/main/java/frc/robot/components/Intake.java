@@ -4,7 +4,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 /**
- * Container for the robot's intake.
+ * Container for the robot's intake. Wraps a Spark/Neo Motor.
+ * 
+ * @author 2141 Spartonics
  */
 public class Intake implements IControllerMovement
 {

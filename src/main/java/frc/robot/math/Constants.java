@@ -1,5 +1,10 @@
 package frc.robot.math;
 
+/**
+ * Container for various static variables.
+ * 
+ * @author 2141 Spartonics
+ */
 public class Constants
 {
 	/**

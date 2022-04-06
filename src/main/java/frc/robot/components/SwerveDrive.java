@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.math.Vec2d;
 
 /**
- * Container for the robot's swerve drivetrain.
+ * Container for the robot's swerve drivetrain. Wraps a gyroscope and swerve modules.
+ * 
+ * @author 2141 Spartonics
  */
 public class SwerveDrive implements IControllerMovement
 {

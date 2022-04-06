@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * Interface for controlling robot part movemenbt via XBox controllers.
+ * 
+ * @author 2141 Spartonics
  */
 public interface IControllerMovement
 {
