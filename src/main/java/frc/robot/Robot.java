@@ -33,6 +33,11 @@ public class Robot extends TimedRobot
 	private static final XboxController PRIMARY_CONTROLLER = new XboxController(0);
     private static final XboxController SECONDARY_CONTROLLER = new XboxController(1);
 
+    private static final AutonomousHandler AUTO_HANDLER = new AutonomousHandler(
+        () -> DRIVETRAIN.runAuto(1d, 0d, 0d),
+        () -> DRIVETRAIN.runAuto(0d, 0d, 0d)
+    );
+
 	@Override
 	public void robotInit()
 	{
@@ -45,6 +50,32 @@ public class Robot extends TimedRobot
 	{
 		DRIVETRAIN.resetMotors();
 	}
+
+    @Override
+    public void autonomousInit()
+    {
+        AUTO_HANDLER.reset();
+    }
+
+    @Override
+    public void autonomousPeriodic()
+    {
+        try
+        {
+            AUTO_HANDLER.run();
+        }
+        catch(Exception e)
+        {
+            System.out.println("Something has errored in the autonomous!");
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void robotPeriodic()
+    {
+        System.out.println("Upper: " + ELEVATOR.getUpperSwitch().get() + " \t" + "Lower: " + ELEVATOR.getLowerSwitch().get());
+    }
 
 	@Override
 	public void teleopPeriodic()

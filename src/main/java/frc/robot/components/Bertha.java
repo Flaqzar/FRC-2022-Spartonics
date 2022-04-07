@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
  * 
  * @author 2141 Spartonics
  */
-public class Bertha implements IControllerMovement
+public class Bertha implements IControllerMovement, IAutonomous
 {
     private final Solenoid push;
     private final Solenoid pull;
@@ -44,6 +44,17 @@ public class Bertha implements IControllerMovement
         {
             this.pull();
         }
+    }
+
+    /**
+     * Raises/Lowers Big Bertha. The passed in argument is direction (-1 to lower, 1 to raise)
+     * 
+     * @param args direciton
+     */
+    @Override
+    public boolean runAuto(double... args)
+    {
+        return true;
     }
     
     /**

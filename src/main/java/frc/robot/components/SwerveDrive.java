@@ -14,7 +14,7 @@ import frc.robot.math.Vec2d;
  * 
  * @author 2141 Spartonics
  */
-public class SwerveDrive implements IControllerMovement
+public class SwerveDrive implements IControllerMovement, IAutonomous
 {
     private static int resetTimer = 0;
     private final AHRS gyro;
@@ -103,6 +103,20 @@ public class SwerveDrive implements IControllerMovement
 		}
 
         this.move(movementVec, rightXAxis);
+    }
+
+    /**
+     * Moves and rotates the swerve drivetrain to a specified location and rotation. 
+     * The passed in arguments are x position (measured in meters), y position (measured 
+     * in meters), and direction (measured in radians relative to the gyro). Movement 
+     * is relaive to what the gyro consideres the origin.
+     * 
+     * @param args x position, y position, rotation
+     */
+    @Override
+    public boolean runAuto(double... args)
+    {
+        return true;
     }
 
     /**

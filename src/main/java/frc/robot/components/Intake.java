@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
  * 
  * @author 2141 Spartonics
  */
-public class Intake implements IControllerMovement
+public class Intake implements IControllerMovement, IAutonomous
 {
     private Spark motor;
     private double suck;
@@ -38,11 +38,11 @@ public class Intake implements IControllerMovement
             rTrigger = rTrigger || controllers[i].getRawAxis(3) > 0.5d;
         }
 
-        if(rButton)
+        if(rTrigger)
 		{
 			this.suck();
 		}
-		else if(rTrigger)
+		else if(rButton)
 		{
 			this.shoot();
 		}
@@ -50,6 +50,19 @@ public class Intake implements IControllerMovement
 		{
 			this.hold();
 		}
+    }
+
+    /**
+     * Turns on the intake for a specified amount of time. The passed in arguments are 
+     * direction (1 = shoot, -1 = suck, 0 = hold) and duration (in milliseconds or -1 
+     * to enable until concurrent steps have finished).
+     * 
+     * @param args direction, duration
+     */
+    @Override
+    public boolean runAuto(double... args)
+    {
+        return true;
     }
 
     /**
