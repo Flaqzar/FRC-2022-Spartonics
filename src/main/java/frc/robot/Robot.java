@@ -27,8 +27,9 @@ public class Robot extends TimedRobot
     private static final XboxController SECONDARY_CONTROLLER = new XboxController(1);
 
     private static final AutonomousHandler AUTO_HANDLER = new AutonomousHandler(
-        () -> DRIVETRAIN.runAuto(1d, 0d, 0d),
-        () -> DRIVETRAIN.runAuto(0d, 0d, 0d)
+        () -> DRIVETRAIN.runAuto(0.25d, 0d, 0d),
+        () -> INTAKE.runAuto(1, 3000),
+        () -> DRIVETRAIN.runAuto(-1d, 0d, 0d)
     );
 
 	@Override
@@ -48,6 +49,8 @@ public class Robot extends TimedRobot
     public void autonomousInit()
     {
         AUTO_HANDLER.reset();
+        DRIVETRAIN.getGyro().resetDisplacement();
+        DRIVETRAIN.getGyro().reset();
     }
 
     @Override

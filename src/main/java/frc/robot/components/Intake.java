@@ -14,6 +14,9 @@ public class Intake implements IControllerMovement, IAutonomous
     private final double suck;
     private final double shoot;
 
+    private long autoEndTime;
+    private long autoDuration;
+
     /**
      * @param intakeMotor the PWM id of the intake motor
      * @param suckSpeed the speed of the motor when sucking in balls
@@ -24,6 +27,8 @@ public class Intake implements IControllerMovement, IAutonomous
         this.motor = new Spark(intakeMotor);
         this.suck = suckSpeed;
         this.shoot = shootSpeed;
+        this.autoEndTime = 0l;
+        this.autoDuration = 0l;
     }
 
     @Override
@@ -62,7 +67,26 @@ public class Intake implements IControllerMovement, IAutonomous
     @Override
     public boolean runAuto(double... args)
     {
-        return true;
+        if(this.autoDuration != args[1])
+        {
+            this.autoDuration = (long) args[1];
+            this.autoEndTime = this.autoDuration + System.currentTimeMillis();
+        }
+
+        switch((int) args[0])
+        {
+        case -1:
+            this.suck();
+            break;
+        case 1:
+            this.shoot();
+            break;
+        default:
+            this.hold();
+            break;
+        }
+
+        return args[1] == -1 ||  this.autoEndTime <= System.currentTimeMillis();
     }
 
     /**
