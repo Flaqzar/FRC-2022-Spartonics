@@ -10,17 +10,10 @@ import frc.robot.components.Intake;
 import frc.robot.components.SwerveDrive;
 import frc.robot.components.SwerveModule;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticsControlModule;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class Robot extends TimedRobot
 {
-    // TODO pneumatics stuff.
-	private static final Compressor COMPRESSOR = new Compressor(PneumaticsModuleType.CTREPCM);
-	private static final PneumaticsControlModule REGULATOR = new PneumaticsControlModule();
-
-	private static final SwerveDrive DRIVETRAIN = new SwerveDrive(
+    private static final SwerveDrive DRIVETRAIN = new SwerveDrive(
         new AHRS(SPI.Port.kMXP),
         new SwerveModule(2, 1, 11, -3d * Math.PI / 4d, -274.482421875d),
         new SwerveModule(4, 3, 12, -Math.PI / 4d, -228.33984375d),
@@ -69,12 +62,6 @@ public class Robot extends TimedRobot
             System.out.println("Something has errored in the autonomous!");
             System.out.println(e);
         }
-    }
-
-    @Override
-    public void robotPeriodic()
-    {
-        System.out.println("Upper: " + ELEVATOR.getUpperSwitch().get() + " \t" + "Lower: " + ELEVATOR.getLowerSwitch().get());
     }
 
 	@Override

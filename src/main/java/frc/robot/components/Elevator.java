@@ -66,11 +66,11 @@ public class Elevator implements IControllerMovement, IAutonomous
         {
             this.upMotor.set(0.2d * dPad);
         }
-        else if(lButton)
+        else if(lButton && this.upperSwitch.get())
 		{
 			this.goUp();
 		}
-		else if(lTrigger)
+		else if(lTrigger && this.lowerSwitch.get())
 		{
 			this.goDown();
 		}

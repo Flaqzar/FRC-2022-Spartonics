@@ -74,7 +74,7 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
         {
             leftXAxis =  Math.abs(controllers[i].getRawAxis(0)) > Math.abs(leftXAxis) ? controllers[i].getRawAxis(0) : leftXAxis;
             leftYAxis =  Math.abs(controllers[i].getRawAxis(1)) > Math.abs(leftYAxis) ? controllers[i].getRawAxis(1) : leftYAxis;
-            rightXAxis =  Math.abs(controllers[i].getRawAxis(4)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(4) : leftXAxis;
+            rightXAxis =  Math.abs(controllers[i].getRawAxis(4)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(4) : rightXAxis;
             minusButton = minusButton || controllers[i].getRawButton(7);
             plusButton = plusButton || controllers[i].getRawButton(8);
         }
@@ -102,7 +102,7 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 			rightXAxis = 0d;
 		}
 
-        this.move(movementVec, rightXAxis);
+        this.move(movementVec, 0.25d * rightXAxis);
     }
 
     /**
@@ -116,7 +116,9 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
     @Override
     public boolean runAuto(double... args)
     {
-        return true;
+        Vec2d dirVec = new Vec2d(args[0] - this.gyro.getDisplacementX(), args[1] - this.gyro.getDisplacementZ()).normalize().scale(0.2d);
+        this.move(dirVec, 0d);
+        return Math.pow(this.gyro.getDisplacementX() - args[0], 2d) + Math.pow(this.gyro.getDisplacementZ() - args[1], 2d) < 0.025d;
     }
 
     /**

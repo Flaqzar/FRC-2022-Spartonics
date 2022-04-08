@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.motorcontrol.Spark;
  */
 public class Intake implements IControllerMovement, IAutonomous
 {
-    private Spark motor;
-    private double suck;
-    private double shoot;
+    private final Spark motor;
+    private final double suck;
+    private final double shoot;
 
     /**
      * @param intakeMotor the PWM id of the intake motor
