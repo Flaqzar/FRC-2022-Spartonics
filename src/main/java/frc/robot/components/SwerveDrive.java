@@ -116,9 +116,11 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
     @Override
     public boolean runAuto(double... args)
     {
-        Vec2d dirVec = new Vec2d(args[0] - this.gyro.getDisplacementX(), args[1] - this.gyro.getDisplacementZ()).normalize().scale(0.2d);
+        double xDist = args[0] - this.gyro.getDisplacementX();
+        double yDist = -args[1] - this.gyro.getDisplacementY();
+        Vec2d dirVec = new Vec2d(xDist, yDist).normalize().scale(0.25d);
         this.move(dirVec, 0d);
-        return Math.pow(this.gyro.getDisplacementX() - args[0], 2d) + Math.pow(this.gyro.getDisplacementZ() - args[1], 2d) < 0.025d;
+        return Math.sqrt(xDist * xDist + yDist * yDist) < 0.1d;
     }
 
     /**

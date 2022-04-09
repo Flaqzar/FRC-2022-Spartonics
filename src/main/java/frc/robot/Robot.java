@@ -20,16 +20,14 @@ public class Robot extends TimedRobot
         new SwerveModule(6, 5, 13, Math.PI / 4d, -272.900390625d),
         new SwerveModule(8, 7, 14, 3d * Math.PI / 4d, -299.091796875d));
 
-	private static final Intake INTAKE = new Intake(0, 0.5d, -0.2d);
-    private static final Elevator ELEVATOR = new Elevator(9, 10, 1, 2);
+	private static final Intake INTAKE = new Intake(0, 9, 0.5d, 1d);
+    private static final Elevator ELEVATOR = new Elevator(10, 1, 2);
     private static final Bertha BIG_BERTHA = new Bertha(0, 1);
 	private static final XboxController PRIMARY_CONTROLLER = new XboxController(0);
     private static final XboxController SECONDARY_CONTROLLER = new XboxController(1);
 
     private static final AutonomousHandler AUTO_HANDLER = new AutonomousHandler(
-        () -> DRIVETRAIN.runAuto(0.25d, 0d, 0d),
-        () -> INTAKE.runAuto(1, 3000),
-        () -> DRIVETRAIN.runAuto(-1d, 0d, 0d)
+        () -> DRIVETRAIN.runAuto(0d, -1d, 0d)
     );
 
 	@Override
@@ -43,6 +41,7 @@ public class Robot extends TimedRobot
 	public void disabledExit()
 	{
 		DRIVETRAIN.resetMotors();
+        BIG_BERTHA.pull();
 	}
 
     @Override

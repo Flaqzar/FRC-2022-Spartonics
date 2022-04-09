@@ -12,26 +12,22 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class Elevator implements IControllerMovement, IAutonomous
 {
-    private final WPI_TalonFX upMotor;
-    private final WPI_TalonFX downMotor;
+    private final WPI_TalonFX motor;
     private final DigitalInput upperSwitch;
     private final DigitalInput lowerSwitch;
     
     /**
-     * @param upMotorID the CAN id of the upward pulling motor
-     * @param downMotorID the CAN id of the downward pullling motor
+     * @param MotorID the CAN id of the motor
      * @param upperLimitSwitchID the PWM id of the upper limit switch
      * @param lowerLimitSwitchID the PWM id of the lower limit switch
      */
-    public Elevator(int upMotorID, int downMotorID, int upperLimitSwitchID, int lowerLimitSwitchID)
+    public Elevator(int motorID, int upperLimitSwitchID, int lowerLimitSwitchID)
     {
-        this.upMotor = new WPI_TalonFX(upMotorID);
-        this.downMotor = new WPI_TalonFX(downMotorID);
+        this.motor = new WPI_TalonFX(motorID);
         this.upperSwitch = new DigitalInput (upperLimitSwitchID);
         this.lowerSwitch = new DigitalInput (lowerLimitSwitchID);
 
-        this.upMotor.configFactoryDefault();
-        this.downMotor.configFactoryDefault();
+        this.motor.configFactoryDefault();
     }
 
     @Override
@@ -64,7 +60,7 @@ public class Elevator implements IControllerMovement, IAutonomous
 
         if(dPad != 0)
         {
-            this.upMotor.set(0.2d * dPad);
+            this.motor.set(0.2d * dPad);
         }
         else if(lTrigger)
 		{
@@ -98,8 +94,7 @@ public class Elevator implements IControllerMovement, IAutonomous
      */
     public void goUp()
     {
-        this.upMotor.set(0.636619772367581d);
-        this.downMotor.set(-1d);
+        this.motor.set(1d);
     }
 
     /**
@@ -107,8 +102,7 @@ public class Elevator implements IControllerMovement, IAutonomous
      */
     public void goDown()
     {
-        this.upMotor.set(-0.636619772367581d);
-        this.downMotor.set(1d);
+        this.motor.set(-1d);
     }
 
     /**
@@ -116,28 +110,17 @@ public class Elevator implements IControllerMovement, IAutonomous
      */
     public void hold()
     {
-        this.upMotor.set(0d);
-        this.downMotor.set(0d);
+        this.motor.set(0d);
     }
 
     /**
-     * Getter for the upward pulling motor.
+     * Getter for the motor.
      * 
      * @return The upward pulling motor
      */
     public WPI_TalonFX getUpMotor()
     {
-        return this.upMotor;
-    }
-
-    /**
-     * Getter for the downward pulling motor.
-     * 
-     * @return The downward pulling motor
-     */
-    public WPI_TalonFX getDownMotor()
-    {
-        return this.downMotor;
+        return this.motor;
     }
 
     /**

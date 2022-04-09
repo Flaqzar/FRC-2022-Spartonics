@@ -1,16 +1,18 @@
 package frc.robot.components;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 /**
  * Container for the robot's intake. Wraps a Spark/Neo Motor.
  * 
  * @author 2141 Spartonics
  */
-public class Intake implements IControllerMovement, IAutonomous
+ public class Intake implements IControllerMovement, IAutonomous
 {
-    private final Spark motor;
+    private final WPI_TalonFX suckMotor;
+    private final WPI_TalonFX stopMotor;
+
+
     private final double suck;
     private final double shoot;
 
@@ -18,17 +20,22 @@ public class Intake implements IControllerMovement, IAutonomous
     private long autoDuration;
 
     /**
-     * @param intakeMotor the PWM id of the intake motor
+     * @param intakeSuckMotor the PWM id of the intake sucking motor
+     * @param intakeStopMotor the PWM id of the intake stopping motor
      * @param suckSpeed the speed of the motor when sucking in balls
      * @param blowSpeed the speed of the motor when shooting out balls
      */
-    public Intake(int intakeMotor, double suckSpeed, double shootSpeed)
+    public Intake(int intakeSuckMotor, int intakeStopMotor, double suckSpeed, double shootSpeed)
     {
-        this.motor = new Spark(intakeMotor);
+        this.suckMotor = new WPI_TalonFX(intakeSuckMotor);
+        this.stopMotor = new WPI_TalonFX(intakeStopMotor);
         this.suck = suckSpeed;
         this.shoot = shootSpeed;
         this.autoEndTime = 0l;
         this.autoDuration = 0l;
+
+        this.suckMotor.configFactoryDefault();
+        this.stopMotor.configFactoryDefault();
     }
 
     @Override
@@ -36,11 +43,16 @@ public class Intake implements IControllerMovement, IAutonomous
     {
         boolean rButton = false;
 		boolean rTrigger = false;
+        boolean xButton = false;
+        boolean bButton = false;
 
         for(int i = 0; i < controllers.length; i++)
         {
             rButton = rButton || controllers[i].getRightBumper();
             rTrigger = rTrigger || controllers[i].getRawAxis(3) > 0.5d;
+            xButton = xButton || controllers[i].getXButton();
+            bButton = bButton || controllers[i].getBButton();
+
         }
 
         if(rTrigger)
@@ -55,6 +67,15 @@ public class Intake implements IControllerMovement, IAutonomous
 		{
 			this.hold();
 		}
+
+        if (xButton)
+        {
+            this.stop();
+        }
+        else if (bButton)
+        {
+            this.unstop();
+        }
     }
 
     /**
@@ -94,7 +115,7 @@ public class Intake implements IControllerMovement, IAutonomous
      */
     public void suck()
     {
-        this.motor.set(this.suck);
+        this.suckMotor.set(this.suck);
     }
 
     /**
@@ -102,7 +123,7 @@ public class Intake implements IControllerMovement, IAutonomous
      */
     public void shoot()
     {
-        this.motor.set(this.shoot);
+        this.suckMotor.set(this.shoot);
     }
 
     /**
@@ -110,16 +131,42 @@ public class Intake implements IControllerMovement, IAutonomous
      */
     public void hold()
     {
-        this.motor.set(0d);
+        this.suckMotor.set(0d);
     }
 
     /**
-     * Getter for the intake's motor.
+     * Stops the balls from being spitted out.
+     */
+    public void stop()
+    {
+        this.stopMotor.set(-1d);
+    }
+
+    /**
+     * Unstops the balls.
+     */
+    public void unstop()
+    {
+        this.stopMotor.set(1d);
+    }
+
+    /**
+     * Getter for the intake's sucking motor.
      * 
      * @return The motor used on the intake.
      */
-    public Spark getMotor()
+    public WPI_TalonFX getSuckingMotor()
     {
-        return this.motor;
+        return this.suckMotor;
+    }
+
+    /**
+     * Getter for the intake's stopper motor.
+     * 
+     * @return The motor used on the intake.
+     */
+    public WPI_TalonFX getStoppingMotor()
+    {
+        return this.suckMotor;
     }
 }
