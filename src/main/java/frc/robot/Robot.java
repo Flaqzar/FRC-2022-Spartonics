@@ -28,8 +28,7 @@ public class Robot extends TimedRobot
     private static UsbCamera camera;
 
     private static final AutonomousHandler AUTO_HANDLER = new AutonomousHandler(
-        () -> DRIVETRAIN.runAuto(0d, -1d, 0d), 
-        () -> DRIVETRAIN.setAllSpeeds(0d)
+        () -> DRIVETRAIN.runAuto(0d, -1d, 0d)
     );
 
 	@Override

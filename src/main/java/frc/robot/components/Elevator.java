@@ -89,18 +89,6 @@ public class Elevator implements IControllerMovement, IAutonomous
         return true;
     }
 
-    @Override
-    public void startAuto(double... args)
-    {
-        
-    }
-
-    @Override
-    public void endAuto(double... args)
-    {
-        
-    }
-
     /**
      * Raise the elevator.
      */

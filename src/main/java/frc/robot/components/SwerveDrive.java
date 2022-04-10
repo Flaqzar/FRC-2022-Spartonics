@@ -126,20 +126,13 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
         this.move(dirVec, 0d);
         System.out.println("Distance to desired point: " + Math.sqrt(xDist * xDist + yDist * yDist));
 
-        
-        return Math.sqrt(xDist * xDist + yDist * yDist) < 0.1d;
-    }
+        if(Math.sqrt(xDist * xDist + yDist * yDist) < 0.1d)
+        {
+            this.move(new Vec2d(0d, 0d), 0d);
+            return true;
+        }
 
-    @Override
-    public void startAuto(double... args)
-    {
-        
-    }
-
-    @Override
-    public void endAuto(double... args)
-    {
-        
+        return false;
     }
     
     /**
@@ -148,15 +141,6 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
     public void resetMotors()
     {
         resetTimer = resetTimer <= 0 ? 20 : resetTimer;
-    }
-    
-    public boolean setAllSpeeds(double speed)
-    {
-        this.modules.forEach(m ->
-        {
-            m.setSpeed(speed);
-        });
-        return true;
     }
 
     /**

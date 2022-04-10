@@ -110,18 +110,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
         return args[1] == -1 ||  this.autoEndTime <= System.currentTimeMillis();
     }
 
-    @Override
-    public void startAuto(double... args)
-    {
-
-    }
-
-    @Override
-    public void endAuto(double... args)
-    {
-        
-    }
-
     /**
      * Sucks in the balls.
      */
