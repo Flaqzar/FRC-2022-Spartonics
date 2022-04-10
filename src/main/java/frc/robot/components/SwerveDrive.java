@@ -23,6 +23,8 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
     private final double max;
     
     /**
+     * @param min minimum movement speed (0 to 1)
+     * @param min maximum movement speed (0 to 1)
      * @param gyroscope the swerve drive's gyroscope
      * @param swerveModules the swerve drive's wheel modules
      */
