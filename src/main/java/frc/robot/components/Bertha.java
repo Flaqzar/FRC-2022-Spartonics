@@ -56,6 +56,18 @@ public class Bertha implements IControllerMovement, IAutonomous
     {
         return true;
     }
+
+    @Override
+    public void startAuto(double... args)
+    {
+        
+    }
+
+    @Override
+    public void endAuto(double... args)
+    {
+        
+    }
     
     /**
      * Push Big Bertha up.

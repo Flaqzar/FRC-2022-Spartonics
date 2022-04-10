@@ -14,7 +14,6 @@ public class AutonomousHandler
 {
     private final List<Callable<Boolean>> steps;
 
-    private boolean isRunning;
     private boolean hasFinished;
     private int currentStep;
 
@@ -25,9 +24,7 @@ public class AutonomousHandler
     public AutonomousHandler(final Callable<Boolean>... directions)
     {
         this.steps = Collections.unmodifiableList(Arrays.asList(directions));
-        this.isRunning = false;
-        this.hasFinished = false;
-        this.currentStep = 0;
+        this.reset();
     }
 
     /**
@@ -37,17 +34,10 @@ public class AutonomousHandler
      */
     public void run() throws Exception
     {
-        this.isRunning = !this.hasFinished;
-
         if(!this.hasFinished && this.steps.get(currentStep).call().booleanValue())
         {
             this.currentStep++;
-
-            if(currentStep >= this.steps.size())
-            {
-                this.hasFinished = true;
-                this.isRunning = false;
-            }
+            this.hasFinished = currentStep >= this.steps.size();
         }
     }
 
@@ -56,7 +46,6 @@ public class AutonomousHandler
      */
     public void reset()
     {
-        this.isRunning = false;
         this.hasFinished = false;
         this.currentStep = 0;
     }
@@ -69,17 +58,6 @@ public class AutonomousHandler
     public boolean hasFinished()
     {
         return this.hasFinished;
-    }
-
-    /**
-     * Checks if the autonomous code is running. This means that the handler 
-     * hasn't finished every step.
-     * 
-     * @return Whether or not the autonomous code is running.
-     */
-    public boolean isRunning()
-    {
-        return this.isRunning;
     }
 
     /**

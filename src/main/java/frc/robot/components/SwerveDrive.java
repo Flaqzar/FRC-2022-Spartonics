@@ -69,12 +69,16 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 
         boolean minusButton = false;
 		boolean plusButton = false;
+        double rTrigger = 0d;
+
 
         for(int i = 0; i < controllers.length; i++)
         {
             leftXAxis =  Math.abs(controllers[i].getRawAxis(0)) > Math.abs(leftXAxis) ? controllers[i].getRawAxis(0) : leftXAxis;
             leftYAxis =  Math.abs(controllers[i].getRawAxis(1)) > Math.abs(leftYAxis) ? controllers[i].getRawAxis(1) : leftYAxis;
             rightXAxis =  Math.abs(controllers[i].getRawAxis(4)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(4) : rightXAxis;
+            rTrigger =  Math.abs(controllers[i].getRawAxis(3)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(3) : rTrigger;
+
             minusButton = minusButton || controllers[i].getRawButton(7);
             plusButton = plusButton || controllers[i].getRawButton(8);
         }
@@ -90,7 +94,7 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
             return;
 		}
         
-        Vec2d movementVec = new Vec2d(-leftXAxis, leftYAxis).scale(0.33d);
+        Vec2d movementVec = new Vec2d(-leftXAxis, leftYAxis).scale(0.3d + rTrigger*0.5d);
 
         if(movementVec.getLengthSquared() < 0.0225d)
 		{
@@ -120,15 +124,39 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
         double yDist = -args[1] - this.gyro.getDisplacementY();
         Vec2d dirVec = new Vec2d(xDist, yDist).normalize().scale(0.25d);
         this.move(dirVec, 0d);
+        System.out.println("Distance to desired point: " + Math.sqrt(xDist * xDist + yDist * yDist));
+
+        
         return Math.sqrt(xDist * xDist + yDist * yDist) < 0.1d;
     }
 
+    @Override
+    public void startAuto(double... args)
+    {
+        
+    }
+
+    @Override
+    public void endAuto(double... args)
+    {
+        
+    }
+    
     /**
      * Set a timer for reseting the motors.
      */
     public void resetMotors()
     {
         resetTimer = resetTimer <= 0 ? 20 : resetTimer;
+    }
+    
+    public boolean setAllSpeeds(double speed)
+    {
+        this.modules.forEach(m ->
+        {
+            m.setSpeed(speed);
+        });
+        return true;
     }
 
     /**
