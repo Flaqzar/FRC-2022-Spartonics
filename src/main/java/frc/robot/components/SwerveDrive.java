@@ -76,8 +76,8 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
         {
             leftXAxis =  Math.abs(controllers[i].getRawAxis(0)) > Math.abs(leftXAxis) ? controllers[i].getRawAxis(0) : leftXAxis;
             leftYAxis =  Math.abs(controllers[i].getRawAxis(1)) > Math.abs(leftYAxis) ? controllers[i].getRawAxis(1) : leftYAxis;
-            rightXAxis =  Math.abs(controllers[i].getRawAxis(4)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(4) : rightXAxis;
             rTrigger =  Math.abs(controllers[i].getRawAxis(3)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(3) : rTrigger;
+            rightXAxis =  Math.abs(controllers[i].getRawAxis(4)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(4) : rightXAxis;
 
             minusButton = minusButton || controllers[i].getRawButton(7);
             plusButton = plusButton || controllers[i].getRawButton(8);
@@ -94,7 +94,14 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
             return;
 		}
         
-        Vec2d movementVec = new Vec2d(-leftXAxis, leftYAxis).scale(0.3d + rTrigger*0.5d);
+        Vec2d movementVec = new Vec2d(-leftXAxis, leftYAxis);
+
+        if(movementVec.getLengthSquared() > 1d)
+        {
+            movementVec = movementVec.normalize();
+        }
+
+        movementVec = movementVec.scale(0.33d + 0.67d * rTrigger);
 
         if(movementVec.getLengthSquared() < 0.0225d)
 		{
@@ -106,7 +113,7 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 			rightXAxis = 0d;
 		}
 
-        this.move(movementVec, 0.25d * rightXAxis);
+        this.move(movementVec, (1d - movementVec.getLength()) * rightXAxis);
     }
 
     /**
@@ -122,17 +129,18 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
     {
         double xDist = args[0] - this.gyro.getDisplacementX();
         double yDist = -args[1] - this.gyro.getDisplacementY();
-        Vec2d dirVec = new Vec2d(xDist, yDist).normalize().scale(0.25d);
-        this.move(dirVec, 0d);
-        System.out.println("Distance to desired point: " + Math.sqrt(xDist * xDist + yDist * yDist));
 
         if(Math.sqrt(xDist * xDist + yDist * yDist) < 0.1d)
         {
             this.move(new Vec2d(0d, 0d), 0d);
             return true;
         }
-
-        return false;
+        else
+        {
+            Vec2d dirVec = new Vec2d(xDist, yDist).normalize().scale(0.25d);
+            this.move(dirVec, 0d);
+            return false;
+        }
     }
     
     /**
