@@ -19,13 +19,17 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
     private static int resetTimer = 0;
     private final AHRS gyro;
     private final List<SwerveModule> modules;
+    private final double min;
+    private final double max;
     
     /**
      * @param gyroscope the swerve drive's gyroscope
      * @param swerveModules the swerve drive's wheel modules
      */
-    public SwerveDrive(AHRS gyroscope, SwerveModule... swerveModules)
+    public SwerveDrive(double minSpeed, double maxSpeed, AHRS gyroscope, SwerveModule... swerveModules)
     {
+        this.min = minSpeed;
+        this.max = maxSpeed;
         this.gyro = gyroscope;
         this.modules = Collections.unmodifiableList(Arrays.asList(swerveModules));
     }
@@ -101,7 +105,7 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
             movementVec = movementVec.normalize();
         }
 
-        movementVec = movementVec.scale(0.33d + 0.67d * rTrigger);
+        movementVec = movementVec.scale(min + (max - min) * rTrigger);
 
         if(movementVec.getLengthSquared() < 0.0225d)
 		{

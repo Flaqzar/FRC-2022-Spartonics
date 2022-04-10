@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class Robot extends TimedRobot
 {
-    private static final SwerveDrive DRIVETRAIN = new SwerveDrive(
+    private static final SwerveDrive DRIVETRAIN = new SwerveDrive(0.3d, 0.8d, 
         new AHRS(SPI.Port.kMXP),
         new SwerveModule(2, 1, 11, -3d * Math.PI / 4d, -274.482421875d),
         new SwerveModule(4, 3, 12, -Math.PI / 4d, -228.33984375d),
@@ -28,7 +28,7 @@ public class Robot extends TimedRobot
     private static UsbCamera camera;
 
     private static final AutonomousHandler AUTO_HANDLER = new AutonomousHandler(
-        () -> DRIVETRAIN.runAuto(0d, -1d, 0d)
+        () -> DRIVETRAIN.runAuto(0d, -2d, 0d)
     );
 
 	@Override
@@ -53,13 +53,14 @@ public class Robot extends TimedRobot
     public void autonomousInit()
     {
         AUTO_HANDLER.reset();
-        DRIVETRAIN.getGyro().resetDisplacement();
-        DRIVETRAIN.getGyro().reset();
+        DRIVETRAIN.getGyro().calibrate();
     }
 
     @Override
     public void autonomousPeriodic()
     {
+        if(DRIVETRAIN.getGyro().isCalibrating()) return;
+
         try
         {
             AUTO_HANDLER.run();

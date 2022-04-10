@@ -34,10 +34,13 @@ public class AutonomousHandler
      */
     public void run() throws Exception
     {
-        if(!this.hasFinished && this.steps.get(currentStep).call().booleanValue())
+        if(!this.hasFinished)
         {
-            this.currentStep++;
-            this.hasFinished = currentStep >= this.steps.size();
+            if(this.steps.get(currentStep).call().booleanValue())
+            {
+                this.currentStep++;
+                this.hasFinished = currentStep >= this.steps.size();
+            }
         }
     }
 
