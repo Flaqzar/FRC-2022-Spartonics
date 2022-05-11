@@ -5,13 +5,14 @@ package frc.robot.components;
  * 
  * @author 2141 Spartonics
  */
+@Deprecated
 public interface IAutonomous
 {
-    /**
-     * Run autonomous code.
-     * 
-     * @param args autonomous arguments
-     * @return Whether or not the action has finished.
-     */
-    public boolean runAuto(double... args);
+	/**
+	 * Run autonomous code.
+	 * 
+	 * @param args autonomous arguments
+	 * @return Whether or not the action has finished.
+	 */
+	public boolean runAuto(double... args);
 }

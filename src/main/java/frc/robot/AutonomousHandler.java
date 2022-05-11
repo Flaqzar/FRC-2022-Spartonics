@@ -10,66 +10,67 @@ import java.util.concurrent.Callable;
  * 
  * @author 2141 Spartonics
  */
+@Deprecated
 public class AutonomousHandler
 {
-    private final List<Callable<Boolean>> steps;
+	private final List<Callable<Boolean>> steps;
 
-    private boolean hasFinished;
-    private int currentStep;
+	private boolean hasFinished;
+	private int currentStep;
 
-    /**
-     * @param directions the autonomous commands to run.
-     */
-    @SafeVarargs
-    public AutonomousHandler(final Callable<Boolean>... directions)
-    {
-        this.steps = Collections.unmodifiableList(Arrays.asList(directions));
-        this.reset();
-    }
+	/**
+	 * @param directions the autonomous commands to run.
+	 */
+	@SafeVarargs
+	public AutonomousHandler(final Callable<Boolean>... directions)
+	{
+		this.steps = Collections.unmodifiableList(Arrays.asList(directions));
+		this.reset();
+	}
 
-    /**
-     * Runs the stored autonomous code. 
-     * 
-     * @throws Exception due to Callables.
-     */
-    public void run() throws Exception
-    {
-        if(!this.hasFinished)
-        {
-            if(this.steps.get(currentStep).call().booleanValue())
-            {
-                this.currentStep++;
-                this.hasFinished = currentStep >= this.steps.size();
-            }
-        }
-    }
+	/**
+	 * Runs the stored autonomous code. 
+	 * 
+	 * @throws Exception due to Callables.
+	 */
+	public void run() throws Exception
+	{
+		if(!this.hasFinished)
+		{
+			if(this.steps.get(currentStep).call().booleanValue())
+			{
+				this.currentStep++;
+				this.hasFinished = currentStep >= this.steps.size();
+			}
+		}
+	}
 
-    /**
-     * Resets the handler's variables so that autonomous can be run again.
-     */
-    public void reset()
-    {
-        this.hasFinished = false;
-        this.currentStep = 0;
-    }
+	/**
+	 * Resets the handler's variables so that autonomous can be run again.
+	 */
+	public void reset()
+	{
+		this.hasFinished = false;
+		this.currentStep = 0;
+	}
 
-    /**
-     * Checks if the autonomous code has finished.
-     * 
-     * @return Whether of not the autonomous code has finished.
-     */
-    public boolean hasFinished()
-    {
-        return this.hasFinished;
-    }
+	/**
+	 * Checks if the autonomous code has finished.
+	 * 
+	 * @return Whether of not the autonomous code has finished.
+	 */
+	public boolean hasFinished()
+	{
+		return this.hasFinished;
+	}
 
-    /**
-     * Getter for the current step being run.
-     * 
-     * @return The current step.
-     */
-    public int getCurrentStep()
-    {
-        return this.currentStep;
-    }
+	/**
+	 * Getter for the current step being run.
+	 * 
+	 * @return The current step.
+	 */
+	public int getCurrentStep()
+	{
+		return this.currentStep;
+	}
 }

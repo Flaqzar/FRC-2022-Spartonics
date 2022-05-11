@@ -1,5 +1,7 @@
 package frc.robot.components;
 
+import java.util.Arrays;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -17,20 +19,23 @@ import frc.robot.math.Vec2d;
  */
 public class SwerveModule
 {
-	private final WPI_TalonFX drivingMotor;
-	private final WPI_TalonFX steeringMotor;
-	private final WPI_CANCoder canCoder;
-	private final double canOffset;
-	private final double rotDir;
-
-	/** The steering motor rotation measured in radians. */
-	public double motorRotation;
-
 	/** The PID id used to determine what PID settings to use. */
 	private static final int PID_ID = 0;
+	/** The motor controlling the module's movement. */
+	private final WPI_TalonFX drivingMotor;
+	/** The motor controlling the module's rotation. */
+	private final WPI_TalonFX steeringMotor;
+	/** The can coder measuring the module's absolute rotaiton. */
+	private final WPI_CANCoder canCoder;
+	/** The can coder's rotational offset. This value must be manually set through phoenix tuner. */
+	private final double canOffset;
+	/** The direction of rotation relative to the center of the drivetrain. */
+	private final double rotDireciton;
+	/** The steering motor rotation measured in radians. */
+	private double motorRotation;
 
 	/**
-	 * Initialize new swerve module.
+	 * Initialize a swerve module.
 	 * 
 	 * @param driveMotor drive motor id
 	 * @param steeringMotor steering motor id
@@ -44,8 +49,8 @@ public class SwerveModule
 		this.steeringMotor = new WPI_TalonFX(steeringMotorID);
 		this.canCoder = new WPI_CANCoder(canCoderID);
 		this.canOffset = canCoderOffset;
+		this.rotDireciton = rotationDirection;
 		this.motorRotation = 0;
-		this.rotDir = rotationDirection;
 	}
 
 	/**
@@ -90,11 +95,15 @@ public class SwerveModule
 	 */
 	public void reset()
 	{
-		// Re-align the steering motor
+		// Set the steering motor's internal rotation to 0.
 		this.steeringMotor.setSelectedSensorPosition(0d);
+		// The angle to rotate to face forward.
 		double angleToRotate = this.canCoder.getAbsolutePosition() > 180d ? this.canCoder.getAbsolutePosition() - 360d : this.canCoder.getAbsolutePosition();
-		this.steeringMotor.set(ControlMode.Position, -angleToRotate * 26214.4d / 360d);
+		// Set the steering motor's rotation.
+		this.steeringMotor.set(ControlMode.Position, -angleToRotate * Constants.DEG_TO_TICK);
+		// Reset the steering motor's internal rotation to 0.
 		this.steeringMotor.setSelectedSensorPosition(0d);
+		// Reset the stored motor rotation variable.
 		this.motorRotation = 0d;
 	}
 
@@ -102,8 +111,9 @@ public class SwerveModule
 	 * Sets the angle of the steering motor. Calculations by Alex Green.
 	 * 
 	 * @param angle the angle in radians.
-     * @see <a href="https://www.desmos.com/calculator/t9mc7gj1bf">Alex's Calculations</a>
+	 * @see <a href="https://www.desmos.com/calculator/t9mc7gj1bf">Alex's Calculations</a>
 	 */
+	@Deprecated
 	public void setAngle(Vec2d vec)
 	{
 		double angle = vec.getAngle();
@@ -119,23 +129,62 @@ public class SwerveModule
 	}
 
 	/**
+	 * Sets the motion of the swerve module using a vector for direction and speed. 
+	 * Calculations by Alex Green.
+	 * 
+	 * @param vec the vector representing the serve module's movement
+	 * @see <a href="https://www.desmos.com/calculator/wljdm2dxos">Alex's Calculations</a>
+	 */
+	public void setMotion(Vec2d vec)
+	{
+		if(vec.getLengthSquared() != 0d)
+		{
+			// The motor's rotation bounded from 0 - 2π.
+			double motorAngle = this.motorRotation % Constants.TWO_PI;
+			double vecAngle = vec.getAngle();
+			
+			// All the different rotations the motor could take.
+			Double[] angles = new Double[5];
+			angles[0] = vecAngle - motorAngle;
+			angles[1] = angles[0] + Constants.TWO_PI;
+			angles[2] = angles[0] - Constants.TWO_PI;
+			angles[3] = angles[0] + Math.PI;
+			angles[4] = angles[0] - Math.PI;
+			
+			// Invert the driving motor if the wheel is facing more than 90° away from the target angle.
+			this.drivingMotor.setInverted(Math.abs(angles[0]) > Constants.PI_OVER_TWO && Math.abs(angles[1]) > Constants.PI_OVER_TWO);
+
+			// Sort the array to get the shortest angle at the front.
+			Arrays.sort(angles, (d1, d2) -> Double.compare(Math.abs(d1), Math.abs(d2)));
+
+			// Set the steering motor's rotaiton.
+			this.motorRotation -= angles[0];
+			this.steeringMotor.set(ControlMode.Position, this.motorRotation * Constants.RAD_TO_TICK);
+		}
+
+		// Set the driving motor's speed.
+		this.drivingMotor.set(ControlMode.PercentOutput, vec.getLength());
+	}
+
+	/**
 	 * Sets the speed of the drive motor.
 	 * 
 	 * @param speed the percent speed from -1 to 1.
 	 */
 	public void setSpeed(double speed)
 	{
-		// Clamp the speed between -1 and 1.
-		this.drivingMotor.set(Math.max(-1d, Math.min(1d, speed)));
+		this.drivingMotor.set(speed);
 	}
 
-    /**
-     * Resets the driving motor's encoder rotation to 0.
-     */
-    public void resetDriveEncoder()
-    {
-        this.drivingMotor.setSelectedSensorPosition(0);
-    }
+	/**
+	 * Getter for the drive motor's rotation. This value is not absolute.
+	 * 
+	 * @return The drive motor
+	 */
+	public double getRotationDirection()
+	{
+		return this.rotDireciton;
+	}
 
 	/**
 	 * Getter for the drive motor.
@@ -167,13 +216,9 @@ public class SwerveModule
 		return this.canCoder;
 	}
 
-	/**
-	 * Getter for the module's rotation direction.
-	 * 
-	 * @return The module's rotation direction.
-	 */
-	public double getRotationDirection()
+	@Override
+	public String toString()
 	{
-		return this.rotDir;
+		return "SwerveModule[Steering Motor ID = " + this.steeringMotor.getDeviceID() + ", Driving Motor ID = " + this.drivingMotor.getDeviceID() + ", Cancoder ID = " + this.canCoder.getDeviceID() + "]";
 	}
 }

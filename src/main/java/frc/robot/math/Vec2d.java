@@ -3,7 +3,7 @@ package frc.robot.math;
 /**
  * Represents a two-dimensional vector.
  * 
- * @author Flaqzar
+ * @author Alex Green
  */
 public class Vec2d
 {
