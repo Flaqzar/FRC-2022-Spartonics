@@ -7,6 +7,7 @@ import java.util.List;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.math.Constants;
 import frc.robot.math.Vec2d;
 
 /**
@@ -14,7 +15,7 @@ import frc.robot.math.Vec2d;
  * 
  * @author 2141 Spartonics
  */
-public class SwerveDrive implements IControllerMovement, IAutonomous
+public class SwerveDrive implements IControllerMovement
 {
 	/** A timer used to continually reset the motors. Prevents overshooting the rotation. */
 	private static int resetTimer = 0;
@@ -23,9 +24,11 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 	/** A list of all of the swerve modules on the drivetrain. */
 	private final List<SwerveModule> modules;
 	/** The minimum movement speed of the drivetrain. */
-	private final double min;
+	private final double minMovement;
 	/** The maximum movement speed of the drivetrain. */
-	private final double max;
+	private final double maxMovement;
+
+	private final double maxRot;
 	
 	/**
 	 * @param min minimum movement speed (0 to 1)
@@ -33,10 +36,11 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 	 * @param gyroscope the swerve drive's gyroscope
 	 * @param swerveModules the swerve drive's wheel modules
 	 */
-	public SwerveDrive(double minSpeed, double maxSpeed, AHRS gyroscope, SwerveModule... swerveModules)
+	public SwerveDrive(double minSpeed, double maxSpeed, double maxRotation, AHRS gyroscope, SwerveModule... swerveModules)
 	{
-		this.min = minSpeed;
-		this.max = maxSpeed;
+		this.minMovement = minSpeed;
+		this.maxMovement = maxSpeed;
+		this.maxRot = maxRotation;
 		this.gyro = gyroscope;
 		this.modules = Collections.unmodifiableList(Arrays.asList(swerveModules));
 	}
@@ -56,19 +60,21 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 		if(this.canDrive())
 		{
 			// Vector representation of the speed and direction of the drivetrain.
-			Vec2d driveVec = directionVec.rotate(this.gyro.getYaw() + 180d, true);
+			Vec2d driveVec = directionVec.rotate(this.gyro.getYaw() + 90d, true);
 			
 			this.modules.forEach(m ->
 			{
 				// Vector representation of the modules rotation.
-				Vec2d rotVec = new Vec2d(m.getRotationDirection(), rotationalSpeed, false);
+				Vec2d rotVec = new Vec2d(m.getRotationDirection() + Constants.PI_OVER_TWO, rotationalSpeed, false);
 				// Add the movement and rotation vectors together.
 				Vec2d finalVec = driveVec.add(rotVec);
 				// Set the modules movement to the combined vector.
+				//m.setAngle(finalVec);
+				//m.setSpeed(finalVec.getLength());
 				m.setMotion(finalVec);
 			});
 		}
-		// Reset the motors if the timer isn't.
+		// Reset the motors if the timer isn't 0.
 		else if(resetTimer > 0)
 		{
 			this.modules.forEach(m -> m.reset());
@@ -101,13 +107,13 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 			plusButton = plusButton || controllers[i].getRawButton(8);
 		}
 
-		// Reset the swerve modules when plus is pressed.
+		// Reset the swerve modules when the plus button is pressed.
 		if(plusButton)
 		{
 			this.resetMotors();
 		}
 
-		// Reset the gyro when minus is pressed.
+		// Reset the gyro when the minus button is pressed.
 		if(minusButton)
 		{
 			this.resetGyro();
@@ -123,9 +129,6 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 			movementVec = movementVec.normalize();
 		}
 
-		// Use the right trigger for speed.
-		movementVec = movementVec.scale(min + (max - min) * rTrigger);
-
 		// Create a 15% deadzone on the left joystick.
 		if(movementVec.getLengthSquared() < 0.0225d)
 		{
@@ -133,41 +136,23 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 		}
 
 		// Create a 10% deadzone on the right joystick.
-		if(Math.abs(rightXAxis) < 0.1d)
+		if(Math.abs(rightXAxis) < 0.25d)
 		{
 			rightXAxis = 0d;
 		}
 
+		// Use the right trigger for speed.
+		movementVec = movementVec.scale(this.minMovement + (this.maxMovement - this.minMovement) * rTrigger);
+
+		rightXAxis = this.maxRot * rightXAxis;
+
+		if(rightXAxis + movementVec.getLength() > 1d)
+		{
+			rightXAxis -= movementVec.getLength() + rightXAxis - 1d;
+		}
+
 		// Move the drivetrain using the calculated values.
-		this.move(movementVec, (1d - movementVec.getLength()) * rightXAxis);
-	}
-
-	/**
-	 * Moves and rotates the swerve drivetrain to a specified location and rotation. 
-	 * The passed in arguments are x position (measured in meters), y position (measured 
-	 * in meters), and direction (measured in radians relative to the gyro). Movement 
-	 * is relaive to what the gyro consideres the origin.
-	 * 
-	 * @param args x position, y position, rotation
-	 */
-	@Override
-	@Deprecated
-	public boolean runAuto(double... args)
-	{
-		double xDist = args[0] - this.gyro.getDisplacementX();
-		double yDist = -args[1] - this.gyro.getDisplacementY();
-
-		if(Math.sqrt(xDist * xDist + yDist * yDist) < 0.1d)
-		{
-			this.move(new Vec2d(0d, 0d), 0d);
-			return true;
-		}
-		else
-		{
-			Vec2d dirVec = new Vec2d(xDist, yDist).normalize().scale(0.25d);
-			this.move(dirVec, 0d);
-			return false;
-		}
+		this.move(movementVec, rightXAxis);
 	}
 	
 	/**
@@ -189,7 +174,7 @@ public class SwerveDrive implements IControllerMovement, IAutonomous
 	/**
 	 * Checks if the robot is resetting or if the gyro is callibrating.
 	 * 
-	 * @return Whether or not the robot can drive.
+	 * @return Whether or not the robot can drive
 	 */
 	public boolean canDrive()
 	{
