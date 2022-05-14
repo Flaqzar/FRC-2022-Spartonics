@@ -106,74 +106,81 @@ public class SwerveModule
 	}
 
 	/**
-	 * Sets the angle of the steering motor. Calculations by Alex Green.
+	 * The old motor rotation function. Simply rotates the steering motor in the direction of 
+	 * the passed vector, and sets the driving motor's speed to the length of the vector. 
+	 * The steering motor will take the shortest path of rotation by rotating a maximum of 
+	 * 180° in either direction. IMPORTANT: To use this function, add 90° to the gyro's rotation 
+	 * and subtract 90° from the module rotations in the SwerveDrive class. Calculations by Alex Green.
 	 * 
-	 * @param angle the angle in radians.
+	 * @param vec the vector representing the module's movement
 	 * @see <a href="https://www.desmos.com/calculator/dgkniftpn6">Alex's Calculations</a>
 	 */
 	@Deprecated
 	public void setAngle(Vec2d vec)
 	{
+		// Get the angle of the passed vector.
 		double angle = vec.getAngle();
 
+		// Only rotate if the angle isn't NaN.
 		if(!Double.isNaN(angle))
 		{
+			// The steering motor's rotation bounded between 0 and 2π.
 			double motorAngle = this.motorRotation % Constants.TWO_PI;
+			// The distance between the motor's current rotation and the passed rotation.
 			double angleDif = motorAngle - angle;
+			// An overcomplicated way of getting the shortest distance to to the passed vector.
 			this.motorRotation -= angleDif + (Math.abs(angleDif) > Math.PI ? (motorAngle > angle ? -Constants.TWO_PI : Constants.TWO_PI) : 0d) + Constants.PI_OVER_TWO;
 		}
 
+		// Update the two motor's with the new values.
  		this.steeringMotor.set(ControlMode.Position, this.motorRotation / Constants.TWO_PI * 26214.4d);
+		this.drivingMotor.set(ControlMode.PercentOutput, vec.getLength());
 	}
 
 	/**
-	 * Sets the motion of the swerve module using a vector for direction and speed. 
-	 * Calculations by Alex Green.
+	 * Rotates the steering motor in the direction of the passed vector, and sets the driving 
+	 * motor's speed to the length of the vector. The steering motor will take the shortest 
+	 * path of rotation by rotating a maximum of 90° in either direction. If the distance between 
+	 * the current motor rotation and the passed vector's rotation is greater than 90°, it will 
+	 * rotate away from the vector and invert the speed, effectively rotating the motor in the 
+	 * direction of the vector. Calculations by Alex Green.
 	 * 
 	 * @param vec the vector representing the serve module's movement
 	 * @see <a href="https://www.desmos.com/calculator/ip3i9zr1qg">Alex's Calculations</a>
 	 */
 	public void setMotion(Vec2d vec)
 	{
+		// Only rotate if the vector's length is greater than 0 to prevent NaN values.
 		if(vec.getLengthSquared() != 0d)
 		{
-			// The motor's rotation bounded from 0 - 2π.
+			// Turn the steering motor's rotation into a vector.
 			Vec2d motorVec = new Vec2d(this.motorRotation, false);
+
+			// Invert the driving motor if the wheel is facing more than 90° away from the target angle.
+			this.speedMultiplier = vec.distanceTo(motorVec) > Constants.PI_OVER_TWO ? -1 : 1;
+
+			// Get the angles from the two vectors.
 			double motorAngle = motorVec.getAngle();
 			double vecAngle = vec.getAngle();
 			
-			// All the different rotations the motor could take.
+			// Calculate all the possible rotations the steering motor could take.
 			Double[] angles = new Double[5];
 			angles[0] = vecAngle - motorAngle;
 			angles[1] = angles[0] + Constants.TWO_PI;
 			angles[2] = angles[0] - Constants.TWO_PI;
 			angles[3] = angles[0] + Math.PI;
 			angles[4] = angles[0] - Math.PI;
-			
-			// Invert the driving motor if the wheel is facing more than 90° away from the target angle.
-			this.speedMultiplier = vec.distanceTo(motorVec) > Constants.PI_OVER_TWO ? -1 : 1;
 
 			// Sort the array to get the shortest angle at the front.
 			Arrays.sort(angles, (d1, d2) -> Double.compare(Math.abs(d1), Math.abs(d2)));
 			
-			// Set the steering motor's rotaiton.
+			// Set the steering motor's rotation.
 			this.motorRotation += angles[0];
 			this.steeringMotor.set(ControlMode.Position, this.motorRotation * Constants.RAD_TO_TICK * 12.8d);
 		}
 
 		// Set the driving motor's speed.
 		this.drivingMotor.set(ControlMode.PercentOutput, vec.getLength() * this.speedMultiplier);
-	}
-
-	/**
-	 * Sets the speed of the drive motor.
-	 * 
-	 * @param speed the percent speed from -1 to 1.
-	 */
-	@Deprecated
-	public void setSpeed(double speed)
-	{
-		this.drivingMotor.set(speed);
 	}
 
 	/**
@@ -219,6 +226,7 @@ public class SwerveModule
 	@Override
 	public String toString()
 	{
+		// The class will be represented as "SwerveModule[Steering Motor ID = ?, Driving Motor ID = ?, Cancoder ID = ?]"
 		return "SwerveModule[Steering Motor ID = " + this.steeringMotor.getDeviceID() + ", Driving Motor ID = " + this.drivingMotor.getDeviceID() + ", Cancoder ID = " + this.canCoder.getDeviceID() + "]";
 	}
 }

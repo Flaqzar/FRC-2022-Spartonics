@@ -24,22 +24,23 @@ public class SwerveDrive implements IControllerMovement
 	/** A list of all of the swerve modules on the drivetrain. */
 	private final List<SwerveModule> modules;
 	/** The minimum movement speed of the drivetrain. */
-	private final double minMovement;
+	private final double minMove;
 	/** The maximum movement speed of the drivetrain. */
-	private final double maxMovement;
-
+	private final double maxMove;
+	/** The maximum rotational speed of the robot. */
 	private final double maxRot;
 	
 	/**
-	 * @param min minimum movement speed (0 to 1)
-	 * @param min maximum movement speed (0 to 1)
+	 * @param minSpeed minimum movement speed (0 to 1)
+	 * @param maxSpeed maximum movement speed (0 to 1)
+	 * @param maxRotation maximum rotational speed (0 to 1)
 	 * @param gyroscope the swerve drive's gyroscope
 	 * @param swerveModules the swerve drive's wheel modules
 	 */
 	public SwerveDrive(double minSpeed, double maxSpeed, double maxRotation, AHRS gyroscope, SwerveModule... swerveModules)
 	{
-		this.minMovement = minSpeed;
-		this.maxMovement = maxSpeed;
+		this.minMove = minSpeed;
+		this.maxMove = maxSpeed;
 		this.maxRot = maxRotation;
 		this.gyro = gyroscope;
 		this.modules = Collections.unmodifiableList(Arrays.asList(swerveModules));
@@ -69,8 +70,6 @@ public class SwerveDrive implements IControllerMovement
 				// Add the movement and rotation vectors together.
 				Vec2d finalVec = driveVec.add(rotVec);
 				// Set the modules movement to the combined vector.
-				//m.setAngle(finalVec);
-				//m.setSpeed(finalVec.getLength());
 				m.setMotion(finalVec);
 			});
 		}
@@ -142,10 +141,12 @@ public class SwerveDrive implements IControllerMovement
 		}
 
 		// Use the right trigger for speed.
-		movementVec = movementVec.scale(this.minMovement + (this.maxMovement - this.minMovement) * rTrigger);
+		movementVec = movementVec.scale(this.minMove + (this.maxMove - this.minMove) * rTrigger);
 
+		// Cap the rotational speed.
 		rightXAxis = this.maxRot * rightXAxis;
 
+		// Reduce rotational speed if resulting vector's length could be greater than 1.
 		if(rightXAxis + movementVec.getLength() > 1d)
 		{
 			rightXAxis -= movementVec.getLength() + rightXAxis - 1d;
@@ -204,6 +205,7 @@ public class SwerveDrive implements IControllerMovement
 	@Override
 	public String toString()
 	{
+		// The class will be represented as "SwerveDrive[Module1 = {}, Module2 = {}, ...]"
 		StringBuilder builder = new StringBuilder("SwerveDrive[");
 
 		for(int i = 0; i < this.modules.size(); i++)
