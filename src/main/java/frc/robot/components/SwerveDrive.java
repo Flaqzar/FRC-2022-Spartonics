@@ -48,9 +48,8 @@ public class SwerveDrive implements IControllerMovement
 
 	/**
 	 * Move's the swerve drive. The direction vector is automatically adjusted by the 
-	 * gyroscope. Be wary that the maximum speed of the motors is 1. Both the magnitude 
-	 * of the directional vector and the rotational speed added together must be less 
-	 * than or equal to 1.
+	 * gyroscope. Both the magnitude of the directional vector and the rotational speed 
+	 * added together must be less than or equal to 1.
 	 * 
 	 * @param directionVec the direction and speed to travel (magnitude from -1 to 1)
 	 * @param rotationalSpeed how fast the robot rotates (from -1 to 1)

@@ -32,7 +32,7 @@ public class SwerveModule
 	private final double rotDireciton;
 	/** The steering motor rotation measured in radians. */
 	private double motorRotation;
-
+	/** The speed multiplier used to invert the speed of the drive motor in {@link #setMotion(Vec2d) setMotion}. */
 	private int speedMultiplier;
 
 	/**
@@ -113,6 +113,7 @@ public class SwerveModule
 	 * and subtract 90° from the module rotations in the SwerveDrive class. Calculations by Alex Green.
 	 * 
 	 * @param vec the vector representing the module's movement
+	 * @deprecated in favor of {@link #setMotion(Vec2d) setMotion}.
 	 * @see <a href="https://www.desmos.com/calculator/dgkniftpn6">Alex's Calculations</a>
 	 */
 	@Deprecated
