@@ -96,10 +96,10 @@ public class SwerveDrive implements IControllerMovement
 		// Iterate through the controllers to get their combined inputs.
 		for(int i = 0; i < controllers.length; i++)
 		{
-			leftXAxis =  Math.abs(controllers[i].getRawAxis(0)) > Math.abs(leftXAxis) ? controllers[i].getRawAxis(0) : leftXAxis;
-			leftYAxis =  Math.abs(controllers[i].getRawAxis(1)) > Math.abs(leftYAxis) ? controllers[i].getRawAxis(1) : leftYAxis;
-			rTrigger =  Math.abs(controllers[i].getRawAxis(3)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(3) : rTrigger;
-			rightXAxis =  Math.abs(controllers[i].getRawAxis(4)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(4) : rightXAxis;
+			leftXAxis = Math.abs(controllers[i].getRawAxis(0)) > Math.abs(leftXAxis) ? controllers[i].getRawAxis(0) : leftXAxis;
+			leftYAxis = Math.abs(controllers[i].getRawAxis(1)) > Math.abs(leftYAxis) ? controllers[i].getRawAxis(1) : leftYAxis;
+			rTrigger = Math.abs(controllers[i].getRawAxis(3)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(3) : rTrigger;
+			rightXAxis = Math.abs(controllers[i].getRawAxis(4)) > Math.abs(rightXAxis) ? controllers[i].getRawAxis(4) : rightXAxis;
 
 			minusButton = minusButton || controllers[i].getRawButton(7);
 			plusButton = plusButton || controllers[i].getRawButton(8);
@@ -152,7 +152,7 @@ public class SwerveDrive implements IControllerMovement
 		}
 
 		// Move the drivetrain using the calculated values.
-		this.move(movementVec, rightXAxis);
+		this.move(movementVec, -rightXAxis);
 	}
 	
 	/**
